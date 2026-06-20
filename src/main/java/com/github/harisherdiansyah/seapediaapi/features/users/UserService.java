@@ -20,6 +20,11 @@ public class UserService {
         return userRepository.existsUserEntityByEmail(email);
     }
 
+    public UserEntity getUserByEmail(String email) {
+        return userRepository.findUserEntityByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User with email " + email + " is never exist."));
+    }
+
     public RegisterResponseDTO createUser(RegisterRequestDTO requestDTO) {
         UserEntity.UserEntityBuilder builder = UserEntity.builder()
                 .username(requestDTO.getUsername())
