@@ -1,4 +1,4 @@
-package com.github.harisherdiansyah.seapediaapi.utils;
+package com.github.harisherdiansyah.seapediaapi.core.utils;
 
 import lombok.Data;
 
