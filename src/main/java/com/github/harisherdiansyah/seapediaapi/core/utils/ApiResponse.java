@@ -8,14 +8,14 @@ import java.time.format.DateTimeFormatter;
 @Data
 public class ApiResponse<T> {
     private int statusCode;
-    private boolean isSuccess;
+    private boolean success;
     private String message;
     private T data;
     private String timestamp;
 
-    private ApiResponse(int statusCode, boolean isSuccess, String message, T data) {
+    private ApiResponse(int statusCode, boolean success, String message, T data) {
         this.statusCode = statusCode;
-        this.isSuccess = isSuccess;
+        this.success = success;
         this.message = message;
         this.data = data;
         this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);

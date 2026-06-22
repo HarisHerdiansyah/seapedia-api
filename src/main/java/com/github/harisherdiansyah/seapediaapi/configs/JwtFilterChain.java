@@ -25,21 +25,16 @@ public class JwtFilterChain extends OncePerRequestFilter {
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
-        if (!StringUtils.hasText(authHeader) || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        try {
-            final String at = authHeader.substring(7);
-            final String subject = jwtUtility.extractSubject(at);
-
-            if (StringUtils.hasText(subject)) {
+        if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
+            try {
+                final String at = authHeader.substring(7);
                 Authentication auth = jwtUtility.getAuthentication(at);
                 SecurityContextHolder.getContext().setAuthentication(auth);
+            } catch (Exception e) {
+                // Token invalid or expired — clear context and continue as unauthenticated
+                SecurityContextHolder.clearContext();
             }
-        } finally {
-            SecurityContextHolder.clearContext();
         }
+        filterChain.doFilter(request, response);
     }
 }

@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 public class LoginRequestDTO {
-    @NotBlank(message = "Email can't by empty.")
+    @NotBlank(message = "Email cannot be empty.")
     @Email
     private String email;
 

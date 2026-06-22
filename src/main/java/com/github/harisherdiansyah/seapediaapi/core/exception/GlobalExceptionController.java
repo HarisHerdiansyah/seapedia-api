@@ -1,13 +1,19 @@
 package com.github.harisherdiansyah.seapediaapi.core.exception;
 
 import com.github.harisherdiansyah.seapediaapi.core.utils.ApiResponse;
+import io.jsonwebtoken.JwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.stream.Collectors;
+
 @RestControllerAdvice
 public class GlobalExceptionController {
+
     @ExceptionHandler(DuplicateDataException.class)
     public ResponseEntity<?> duplicateDataException(Exception ex) {
         return ResponseEntity
@@ -27,5 +33,23 @@ public class GlobalExceptionController {
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
                 .body(ApiResponse.error(HttpStatus.FORBIDDEN.value(), ex.getMessage(), null));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> validationException(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult().getFieldErrors()
+                .stream()
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.joining("; "));
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), message, null));
+    }
+
+    @ExceptionHandler({JwtException.class, IllegalArgumentException.class})
+    public ResponseEntity<?> jwtException(RuntimeException ex) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error(HttpStatus.UNAUTHORIZED.value(), "Invalid or expired token.", null));
     }
 }

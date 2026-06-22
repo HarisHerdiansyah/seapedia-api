@@ -9,4 +9,5 @@ import java.util.UUID;
 @Repository
 public interface SessionRepository extends JpaRepository<SessionEntity, UUID> {
     Optional<SessionEntity> findSessionEntityById(UUID id);
+    void deleteAllByExpiresAtBefore(java.time.OffsetDateTime dateTime);
 }

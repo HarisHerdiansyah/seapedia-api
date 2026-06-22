@@ -36,7 +36,7 @@ public class AuthenticationController {
         String cookieResponse = (String) result.get("cookieResponse");
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, cookieResponse)
-                .body(ApiResponse.success(HttpStatus.OK.value(), "Login Success", loginResponse));
+                .body(ApiResponse.success(HttpStatus.OK.value(), "Login successful.", loginResponse));
     }
 
     @PostMapping("/non-admin-role")
@@ -44,8 +44,8 @@ public class AuthenticationController {
             @Valid @RequestBody NonAdminRoleRequestDTO nonAdminRoleRequestDTO,
             @CookieValue(name = "refreshToken", defaultValue = "") String rt) {
         authenticationService.selectActiveRole(nonAdminRoleRequestDTO, rt);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(HttpStatus.CREATED.value(), "Non admin role successfully selected", null));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.success(HttpStatus.OK.value(), "Active role updated successfully.", null));
     }
 
     @PostMapping("/refresh-token")
@@ -59,14 +59,14 @@ public class AuthenticationController {
         String cookieResponse = (String) result.get("cookieResponse");
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, cookieResponse)
-                .body(ApiResponse.success(HttpStatus.OK.value(), "Refresh Success", loginResponse));
+                .body(ApiResponse.success(HttpStatus.OK.value(), "Token refreshed successfully.", loginResponse));
     }
 
     @PatchMapping("/reset-password")
     public ResponseEntity<?> resetPasswordController(@Valid @RequestBody ResetPasswordRequestDTO requestDTO) {
         authenticationService.resetPassword(requestDTO);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(ApiResponse.success(HttpStatus.OK.value(), "Reset password success.", null));
+                .body(ApiResponse.success(HttpStatus.OK.value(), "Password reset successful.", null));
     }
 
     @PostMapping("/logout")
@@ -74,6 +74,6 @@ public class AuthenticationController {
         String response = authenticationService.logout(rt);
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, response)
-                .body(ApiResponse.success(HttpStatus.OK.value(), "Logout success", null));
+                .body(ApiResponse.success(HttpStatus.OK.value(), "Logout successful.", null));
     }
 }
