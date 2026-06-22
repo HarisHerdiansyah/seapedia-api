@@ -1,6 +1,7 @@
 package com.github.harisherdiansyah.seapediaapi.features.authentication;
 
 import com.github.harisherdiansyah.seapediaapi.core.exception.DuplicateDataException;
+import com.github.harisherdiansyah.seapediaapi.core.exception.ForbiddenException;
 import com.github.harisherdiansyah.seapediaapi.core.utils.JwtUtility;
 import com.github.harisherdiansyah.seapediaapi.features.session.ActiveRole;
 import com.github.harisherdiansyah.seapediaapi.features.session.CreateSessionDTO;
@@ -13,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -47,7 +49,44 @@ public class AuthenticationService {
     public Map<String, Object> login(LoginRequestDTO loginRequestDTO, String ipAddress, String deviceInfo) {
         Authentication auth = new UsernamePasswordAuthenticationToken(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
         UserPrincipalEntity principal = (UserPrincipalEntity) auth.getPrincipal();
+        return sessionManager(principal, ipAddress, deviceInfo);
+    }
 
+    public void selectActiveRole(NonAdminRoleRequestDTO nonAdminRoleRequestDTO, String rt) {
+        UUID rtJti = UUID.fromString(jwtUtility.extractJti(rt));
+        sessionService.updateActiveRoleSession(rtJti, nonAdminRoleRequestDTO.getActiveRole());
+    }
+
+    public Map<String, Object> refreshToken(String rt, String ipAddress, String deviceInfo) {
+        if (!StringUtils.hasText(rt)) {
+            throw new ForbiddenException("Refresh token empty. Rotation isn't allowed.");
+        }
+
+        UUID rtJti = UUID.fromString(jwtUtility.extractJti(rt));
+        if (!sessionService.isSessionExist(rtJti)) {
+            throw new ForbiddenException("Session isn't exist. Try to re-login.");
+        }
+
+        sessionService.deleteSession(rtJti);
+
+        Authentication auth = jwtUtility.getAuthentication(rt);
+        UserPrincipalEntity principal = (UserPrincipalEntity) auth.getPrincipal();
+        return sessionManager(principal, ipAddress, deviceInfo);
+    }
+
+    public void resetPassword(ResetPasswordRequestDTO resetPasswordRequestDTO) {
+        boolean isEmailExist = userService.isUserExistByEmail(resetPasswordRequestDTO.getEmail());
+        if (isEmailExist) {
+            throw new DuplicateDataException("User with email " + resetPasswordRequestDTO.getEmail() + " is already exist.");
+        }
+
+        String password = resetPasswordRequestDTO.getNewPassword();
+        String hashedPassword = passwordEncoder.encode(password);
+        resetPasswordRequestDTO.setNewPassword(hashedPassword);
+        userService.updateUserPassword(resetPasswordRequestDTO);
+    }
+
+    private Map<String, Object> sessionManager(UserPrincipalEntity principal, String ipAddress, String deviceInfo) {
         List<String> authorities = principal.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
@@ -77,22 +116,5 @@ public class AuthenticationService {
         result.put("loginResponse", loginResponseDTO);
         result.put("cookieResponse", cookieResponse);
         return result;
-    }
-
-    public void selectActiveRole(NonAdminRoleRequestDTO nonAdminRoleRequestDTO, String rt) {
-        UUID rtJti = UUID.fromString(jwtUtility.extractJti(rt));
-        sessionService.updateActiveRoleSession(rtJti, nonAdminRoleRequestDTO.getActiveRole());
-    }
-
-    public void resetPassword(ResetPasswordRequestDTO resetPasswordRequestDTO) {
-        boolean isEmailExist = userService.isUserExistByEmail(resetPasswordRequestDTO.getEmail());
-        if (isEmailExist) {
-            throw new DuplicateDataException("User with email " + resetPasswordRequestDTO.getEmail() + " is already exist.");
-        }
-
-        String password = resetPasswordRequestDTO.getNewPassword();
-        String hashedPassword = passwordEncoder.encode(password);
-        resetPasswordRequestDTO.setNewPassword(hashedPassword);
-        userService.updateUserPassword(resetPasswordRequestDTO);
     }
 }

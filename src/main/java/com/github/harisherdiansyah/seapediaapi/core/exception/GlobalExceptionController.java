@@ -21,4 +21,11 @@ public class GlobalExceptionController {
                 .status(HttpStatus.NOT_FOUND)
                 .body(ApiResponse.error(HttpStatus.NOT_FOUND.value(), ex.getMessage(), null));
     }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<?> forbiddenException(Exception ex) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.error(HttpStatus.FORBIDDEN.value(), ex.getMessage(), null));
+    }
 }

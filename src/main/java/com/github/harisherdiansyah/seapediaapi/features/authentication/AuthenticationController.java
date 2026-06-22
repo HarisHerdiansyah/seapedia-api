@@ -49,9 +49,17 @@ public class AuthenticationController {
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshTokenController() {
+    public ResponseEntity<?> refreshTokenController(
+            @CookieValue(name = "refreshToken", defaultValue = "") String rt, HttpServletRequest httpServletRequest) {
+        String ipAddress = requestUtility.getClientIpAddress(httpServletRequest);
+        String deviceInfo = requestUtility.getClientDeviceInfo(httpServletRequest);
+
+        Map<String, Object> result = authenticationService.refreshToken(rt, ipAddress, deviceInfo);
+        LoginResponseDTO loginResponse = (LoginResponseDTO) result.get("loginResponse");
+        String cookieResponse = (String) result.get("cookieResponse");
         return ResponseEntity.status(HttpStatus.OK)
-                .body(ApiResponse.success(HttpStatus.OK.value(), "Refresh token retrieved", null));
+                .header(HttpHeaders.SET_COOKIE, cookieResponse)
+                .body(ApiResponse.success(HttpStatus.OK.value(), "Refresh Success", loginResponse));
     }
 
     @PatchMapping("/reset-password")

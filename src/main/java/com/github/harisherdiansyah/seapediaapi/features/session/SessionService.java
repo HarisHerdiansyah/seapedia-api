@@ -33,5 +33,13 @@ public class SessionService {
         sessionRepository.save(sessionObject);
     }
 
-    public void deleteSession() {}
+    public boolean isSessionExist(UUID jti) {
+        return sessionRepository.existsById(jti);
+    }
+
+    public void deleteSession(UUID jti) {
+        sessionRepository.deleteById(jti);
+    }
+
+    public void cleanUpExpiredSession() {}
 }
