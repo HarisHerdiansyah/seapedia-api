@@ -14,7 +14,4 @@ public class LoginRequestDTO {
 
     @NotBlank(message = "Password can't be empty.")
     private String password;
-
-    @NotNull(message = "Role can't be empty, choose ADMIN or NON_ADMIN.")
-    private UserRole role;
 }

@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,7 +15,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.nio.file.attribute.UserPrincipal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +70,10 @@ public class JwtUtility {
         return claimsResolver.apply(claims);
     }
 
+    public String extractJti(String token) {
+        return extractClaim(token, Claims::getId);
+    }
+
     public String extractSubject(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -87,12 +91,24 @@ public class JwtUtility {
                 .stream()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
+
         UserPrincipalEntity userPrincipal = UserPrincipalEntity.builder()
                 .userId(extractUserId(token))
                 .username(extractSubject(token))
                 .password("")
                 .authorities(authorities)
                 .build();
+
         return new UsernamePasswordAuthenticationToken(userPrincipal, null, authorities);
+    }
+
+    public ResponseCookie rtResponseBuilder(String refreshToken) {
+        return ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("Strict")
+                .maxAge(rtExp)
+                .path("/")
+                .build();
     }
 }

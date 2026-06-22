@@ -1,17 +1,23 @@
 package com.github.harisherdiansyah.seapediaapi.features.authentication;
 
 import com.github.harisherdiansyah.seapediaapi.core.utils.ApiResponse;
+import com.github.harisherdiansyah.seapediaapi.core.utils.RequestUtility;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/authentication")
 @RequiredArgsConstructor
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
+    private final RequestUtility requestUtility;
 
     @PostMapping("/register")
     public ResponseEntity<?> registerController(@Valid @RequestBody RegisterRequestDTO requestDTO) {
@@ -21,8 +27,31 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginController(@Valid @RequestBody LoginRequestDTO requestDTO) {
-        return null;
+    public ResponseEntity<?> loginController(@Valid @RequestBody LoginRequestDTO requestDTO, HttpServletRequest httpServletRequest) {
+        String ipAddress = requestUtility.getClientIpAddress(httpServletRequest);
+        String deviceInfo = requestUtility.getClientDeviceInfo(httpServletRequest);
+
+        Map<String, Object> result = authenticationService.login(requestDTO, ipAddress, deviceInfo);
+        LoginResponseDTO loginResponse = (LoginResponseDTO) result.get("loginResponse");
+        String cookieResponse = (String) result.get("cookieResponse");
+        return ResponseEntity.status(HttpStatus.OK)
+                .header(HttpHeaders.SET_COOKIE, cookieResponse)
+                .body(ApiResponse.success(HttpStatus.OK.value(), "Login Success", loginResponse));
+    }
+
+    @PostMapping("/non-admin-role")
+    public ResponseEntity<?> nonAdminRoleController(
+            @Valid @RequestBody NonAdminRoleRequestDTO nonAdminRoleRequestDTO,
+            @CookieValue(name = "refreshToken", defaultValue = "") String rt) {
+        authenticationService.selectActiveRole(nonAdminRoleRequestDTO, rt);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(HttpStatus.CREATED.value(), "Non admin role successfully selected", null));
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refreshTokenController() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.success(HttpStatus.OK.value(), "Refresh token retrieved", null));
     }
 
     @PatchMapping("/reset-password")
@@ -30,5 +59,11 @@ public class AuthenticationController {
         authenticationService.resetPassword(requestDTO);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.success(HttpStatus.OK.value(), "Reset password success.", null));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logoutController() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.success(HttpStatus.OK.value(), "Logout success", null));
     }
 }
