@@ -20,6 +20,11 @@ public class AuthenticationController {
                 .body(ApiResponse.success(HttpStatus.CREATED.value(), "Register success.", responseDTO));
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<?> loginController(@Valid @RequestBody LoginRequestDTO requestDTO) {
+        return null;
+    }
+
     @PatchMapping("/reset-password")
     public ResponseEntity<?> resetPasswordController(@Valid @RequestBody ResetPasswordRequestDTO requestDTO) {
         authenticationService.resetPassword(requestDTO);
