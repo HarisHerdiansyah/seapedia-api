@@ -70,8 +70,10 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logoutController() {
+    public ResponseEntity<?> logoutController(@CookieValue(name = "refreshToken", defaultValue = "") String rt) {
+        String response = authenticationService.logout(rt);
         return ResponseEntity.status(HttpStatus.OK)
+                .header(HttpHeaders.SET_COOKIE, response)
                 .body(ApiResponse.success(HttpStatus.OK.value(), "Logout success", null));
     }
 }

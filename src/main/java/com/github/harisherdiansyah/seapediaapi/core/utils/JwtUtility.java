@@ -13,6 +13,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -102,12 +103,13 @@ public class JwtUtility {
         return new UsernamePasswordAuthenticationToken(userPrincipal, null, authorities);
     }
 
-    public ResponseCookie rtResponseBuilder(String refreshToken) {
-        return ResponseCookie.from("refreshToken", refreshToken)
+    public ResponseCookie cookieResponseBuilder(String refreshToken) {
+        boolean isRtExist = StringUtils.hasText(refreshToken);
+        return ResponseCookie.from("refreshToken", isRtExist ? refreshToken : "")
                 .httpOnly(true)
                 .secure(false)
                 .sameSite("Strict")
-                .maxAge(rtExp)
+                .maxAge(isRtExist ? rtExp : 0)
                 .path("/")
                 .build();
     }

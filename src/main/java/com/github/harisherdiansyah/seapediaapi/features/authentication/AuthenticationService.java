@@ -86,6 +86,16 @@ public class AuthenticationService {
         userService.updateUserPassword(resetPasswordRequestDTO);
     }
 
+    public String logout(String rt) {
+        String response = jwtUtility.cookieResponseBuilder("").toString();
+        if (!StringUtils.hasText(rt)) return response;
+        UUID rtJti = UUID.fromString(jwtUtility.extractJti(rt));
+        if (!sessionService.isSessionExist(rtJti)) return response;
+
+        sessionService.deleteSession(rtJti);
+        return response;
+    }
+
     private Map<String, Object> sessionManager(UserPrincipalEntity principal, String ipAddress, String deviceInfo) {
         List<String> authorities = principal.getAuthorities()
                 .stream()
@@ -103,7 +113,7 @@ public class AuthenticationService {
         CreateSessionDTO sessionDTO = new CreateSessionDTO(rtJti, principal.getUserId(), deviceInfo, ipAddress, ActiveRole.NON_ADMIN);
         sessionService.createSession(sessionDTO);
 
-        String cookieResponse = jwtUtility.rtResponseBuilder(rt).toString();
+        String cookieResponse = jwtUtility.cookieResponseBuilder(rt).toString();
 
         UserRole role = authorities.stream().map(UserRole::valueOf).findFirst().orElse(UserRole.NON_ADMIN);
         LoginResponseDTO.UserObject userObject = new LoginResponseDTO.UserObject(
