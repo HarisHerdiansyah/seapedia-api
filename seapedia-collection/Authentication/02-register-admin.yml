@@ -18,16 +18,20 @@ http:
   auth: inherit
 
 runtime:
-  tests: |-
-    test("Status is 201 Created", function() {
-      expect(res.getStatus()).to.equal(201);
-    });
-    test("success is true", function() {
-      expect(res.getBody().success).to.equal(true);
-    });
-    test("role is ADMIN", function() {
-      expect(res.getBody().data.role).to.equal("ADMIN");
-    });
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 201 Created", function() {
+          expect(res.getStatus()).to.equal(201);
+        });
+
+        test("success is true", function() {
+          expect(res.getBody().success).to.equal(true);
+        });
+
+        test("role is ADMIN", function() {
+          expect(res.getBody().data.role).to.equal("ADMIN");
+        });
 
 settings:
   encodeUrl: true

@@ -18,20 +18,24 @@ http:
   auth: inherit
 
 runtime:
-  tests: |-
-    test("Status is 201 Created", function() {
-      expect(res.getStatus()).to.equal(201);
-    });
-    test("success is true", function() {
-      expect(res.getBody().success).to.equal(true);
-    });
-    test("data contains id, username, email, role", function() {
-      const data = res.getBody().data;
-      expect(data).to.have.property("id");
-      expect(data.username).to.equal("testuser01");
-      expect(data.email).to.equal("testuser01@example.com");
-      expect(data.role).to.equal("NON_ADMIN");
-    });
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 201 Created", function() {
+          expect(res.getStatus()).to.equal(201);
+        });
+
+        test("success is true", function() {
+          expect(res.getBody().success).to.equal(true);
+        });
+
+        test("data contains id, username, email, role", function() {
+          const data = res.getBody().data;
+          expect(data).to.have.property("id");
+          expect(data.username).to.equal("testuser01");
+          expect(data.email).to.equal("testuser01@example.com");
+          expect(data.role).to.equal("NON_ADMIN");
+        });
 
 settings:
   encodeUrl: true

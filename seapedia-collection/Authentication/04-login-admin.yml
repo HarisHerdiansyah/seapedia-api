@@ -17,18 +17,21 @@ http:
 
 runtime:
   scripts:
-    post-response: |-
-      if (res.getStatus() === 200) {
-        const token = res.getBody().data.accessToken;
-        bru.setEnvVar("ACCESS_TOKEN", token);
-      }
-  tests: |-
-    test("Status is 200 OK", function() {
-      expect(res.getStatus()).to.equal(200);
-    });
-    test("role is ADMIN", function() {
-      expect(res.getBody().data.userData.role).to.equal("ADMIN");
-    });
+    - type: post-response
+      code: |-
+        if (res.getStatus() === 200) {
+          const token = res.getBody().data.accessToken;
+          bru.setEnvVar("ACCESS_TOKEN", token);
+        }
+    - type: tests
+      code: |-
+        test("Status is 200 OK", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("role is ADMIN", function() {
+          expect(res.getBody().data.userData.role).to.equal("ADMIN");
+        });
 
 settings:
   encodeUrl: true

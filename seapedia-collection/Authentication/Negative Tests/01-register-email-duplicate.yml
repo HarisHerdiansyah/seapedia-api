@@ -18,16 +18,20 @@ http:
   auth: inherit
 
 runtime:
-  tests: |-
-    test("Status is 409 Conflict", function() {
-      expect(res.getStatus()).to.equal(409);
-    });
-    test("success is false", function() {
-      expect(res.getBody().success).to.equal(false);
-    });
-    test("message mentions email already exists", function() {
-      expect(res.getBody().message).to.include("already exists");
-    });
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 409 Conflict", function() {
+          expect(res.getStatus()).to.equal(409);
+        });
+
+        test("success is false", function() {
+          expect(res.getBody().success).to.equal(false);
+        });
+
+        test("message mentions email already exists", function() {
+          expect(res.getBody().message).to.include("already exists");
+        });
 
 settings:
   encodeUrl: true

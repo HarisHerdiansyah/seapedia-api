@@ -17,26 +17,31 @@ http:
 
 runtime:
   scripts:
-    post-response: |-
-      if (res.getStatus() === 200) {
-        const token = res.getBody().data.accessToken;
-        bru.setEnvVar("ACCESS_TOKEN", token);
-      }
-  tests: |-
-    test("Status is 200 OK", function() {
-      expect(res.getStatus()).to.equal(200);
-    });
-    test("success is true", function() {
-      expect(res.getBody().success).to.equal(true);
-    });
-    test("accessToken is present in body", function() {
-      expect(res.getBody().data.accessToken).to.be.a("string").and.not.empty;
-    });
-    test("userData contains id, username, email, role", function() {
-      const userData = res.getBody().data.userData;
-      expect(userData).to.have.property("id");
-      expect(userData.role).to.equal("NON_ADMIN");
-    });
+    - type: post-response
+      code: |-
+        if (res.getStatus() === 200) {
+          const token = res.getBody().data.accessToken;
+          bru.setEnvVar("ACCESS_TOKEN", token);
+        }
+    - type: tests
+      code: |-
+        test("Status is 200 OK", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("success is true", function() {
+          expect(res.getBody().success).to.equal(true);
+        });
+
+        test("accessToken is present in body", function() {
+          expect(res.getBody().data.accessToken).to.be.a("string").and.not.empty;
+        });
+
+        test("userData contains id and role NON_ADMIN", function() {
+          const userData = res.getBody().data.userData;
+          expect(userData).to.have.property("id");
+          expect(userData.role).to.equal("NON_ADMIN");
+        });
 
 settings:
   encodeUrl: true
