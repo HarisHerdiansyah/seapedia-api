@@ -1,0 +1,43 @@
+meta {
+  name: Login (ADMIN)
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{base_url}}/api/authentication/login
+  body: json
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "admin01@example.com",
+    "password": "AdminPass1!"
+  }
+}
+
+script:post-response {
+  if (res.getStatus() === 200) {
+    const token = res.getBody().data.accessToken;
+    bru.setVar("access_token", token);
+  }
+}
+
+tests {
+  test("Status is 200 OK", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("role is ADMIN", function() {
+    expect(res.getBody().data.userData.role).to.equal("ADMIN");
+  });
+
+  test("Set-Cookie header contains refreshToken", function() {
+    const setCookie = res.getHeaders()["set-cookie"];
+    expect(setCookie).to.include("refreshToken");
+  });
+}

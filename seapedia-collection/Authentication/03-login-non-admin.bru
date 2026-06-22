@@ -1,0 +1,54 @@
+meta {
+  name: Login (NON_ADMIN)
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/api/authentication/login
+  body: json
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "testuser01@example.com",
+    "password": "Password1!"
+  }
+}
+
+script:post-response {
+  if (res.getStatus() === 200) {
+    const token = res.getBody().data.accessToken;
+    bru.setVar("access_token", token);
+  }
+}
+
+tests {
+  test("Status is 200 OK", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("success is true", function() {
+    expect(res.getBody().success).to.equal(true);
+  });
+
+  test("accessToken is present in body", function() {
+    expect(res.getBody().data.accessToken).to.be.a("string").and.not.empty;
+  });
+
+  test("userData contains id, username, email, role", function() {
+    const userData = res.getBody().data.userData;
+    expect(userData).to.have.property("id");
+    expect(userData.role).to.equal("NON_ADMIN");
+  });
+
+  test("Set-Cookie header contains refreshToken (HttpOnly)", function() {
+    const setCookie = res.getHeaders()["set-cookie"];
+    expect(setCookie).to.include("refreshToken");
+    expect(setCookie).to.include("HttpOnly");
+  });
+}

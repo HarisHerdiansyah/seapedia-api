@@ -63,6 +63,10 @@ public class AuthenticationService {
     }
 
     public void selectActiveRole(NonAdminRoleRequestDTO nonAdminRoleRequestDTO, String rt) {
+        if (!StringUtils.hasText(rt)) {
+            throw new ForbiddenException("Refresh token is missing.");
+        }
+
         UUID rtJti = UUID.fromString(jwtUtility.extractJti(rt));
 
         // Determine user's base role from the refresh token claims

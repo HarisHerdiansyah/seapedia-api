@@ -1,0 +1,31 @@
+meta {
+  name: [Negative] Login — Email Not Found
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{base_url}}/api/authentication/login
+  body: json
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "tidakada@example.com",
+    "password": "Password1!"
+  }
+}
+
+tests {
+  test("Status is 401 Unauthorized", function() {
+    expect(res.getStatus()).to.equal(401);
+  });
+
+  test("success is false", function() {
+    expect(res.getBody().success).to.equal(false);
+  });
+}

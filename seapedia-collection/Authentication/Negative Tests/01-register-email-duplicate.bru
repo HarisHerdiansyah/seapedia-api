@@ -1,0 +1,37 @@
+meta {
+  name: [Negative] Register — Email Duplicate
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/api/authentication/register
+  body: json
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "username": "userlain99",
+    "email": "testuser01@example.com",
+    "password": "Password1!",
+    "role": "NON_ADMIN"
+  }
+}
+
+tests {
+  test("Status is 409 Conflict", function() {
+    expect(res.getStatus()).to.equal(409);
+  });
+
+  test("success is false", function() {
+    expect(res.getBody().success).to.equal(false);
+  });
+
+  test("message mentions email already exists", function() {
+    expect(res.getBody().message).to.include("already exists");
+  });
+}
