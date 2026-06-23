@@ -1,5 +1,6 @@
 package com.github.harisherdiansyah.seapediaapi.features.authentication;
 
+import com.github.harisherdiansyah.seapediaapi.core.exception.NotFoundException;
 import com.github.harisherdiansyah.seapediaapi.features.users.UserEntity;
 import com.github.harisherdiansyah.seapediaapi.features.users.UserService;
 import lombok.RequiredArgsConstructor;
@@ -18,23 +19,30 @@ import java.util.stream.Collectors;
 public class UserPrincipalService implements UserDetailsService {
     private final UserService userService;
 
+    /**
+     * Loads user by email. Spring Security uses "username" generically,
+     * but in this system the login identifier is the email.
+     */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        UserEntity user = userService.getUserByEmail(email);
-        if (user == null) {
-            throw new UsernameNotFoundException("Email is never exist.");
+        try {
+            UserEntity user = userService.getUserByEmail(email);
+
+            List<String> role = List.of(user.getRole().toString());
+            List<GrantedAuthority> authorities = role
+                    .stream()
+                    .map(SimpleGrantedAuthority::new)
+                    .collect(Collectors.toList());
+
+            return UserPrincipalEntity.builder()
+                    .userId(user.getId())
+                    .username(user.getEmail())
+                    .displayName(user.getUsername())
+                    .password(user.getPasswordHash())
+                    .authorities(authorities)
+                    .build();
+        } catch (NotFoundException e) {
+            throw new UsernameNotFoundException("User with email " + email + " not found.");
         }
-
-        List<String> role = List.of(user.getRole().toString());
-        List<GrantedAuthority> authorities = role
-                .stream()
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
-
-        UserPrincipalEntity.UserPrincipalEntityBuilder builder = UserPrincipalEntity.builder()
-                .userId(user.getId())
-                .username(user.getEmail())
-                .authorities(authorities);
-        return builder.build();
     }
 }

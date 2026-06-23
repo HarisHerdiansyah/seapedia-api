@@ -1,0 +1,40 @@
+info:
+  name: 01-register-email-duplicate
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/{{AUTH_MODULE}}/register"
+  body:
+    type: json
+    data: |-
+      {
+        "username": "spring02",
+        "email": "spring01@gmail.com",
+        "password": "Nazhmi#16",
+        "role": "NON_ADMIN"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 409 Conflict", function() {
+          expect(res.getStatus()).to.equal(409);
+        });
+
+        test("success is false", function() {
+          expect(res.getBody().success).to.equal(false);
+        });
+
+        test("message mentions email already exists", function() {
+          expect(res.getBody().message).to.include("already exists");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

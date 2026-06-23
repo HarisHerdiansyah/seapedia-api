@@ -1,0 +1,7 @@
+name: Local Env
+color: "#72c9d8"
+variables:
+  - name: BASE_URL
+    value: http://localhost:8080/api
+  - name: AUTH_MODULE
+    value: authentication

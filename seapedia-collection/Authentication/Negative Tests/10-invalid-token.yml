@@ -1,0 +1,40 @@
+info:
+  name: 10-invalid-token
+  type: http
+  seq: 10
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/{{AUTH_MODULE}}/non-admin-role"
+  headers:
+    - name: Cookie
+      value: "refreshToken=ini.token.palsu.tidak.valid"
+  body:
+    type: json
+    data: |-
+      {
+        "activeRole": "BUYER"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 401 Unauthorized", function() {
+          expect(res.getStatus()).to.equal(401);
+        });
+
+        test("success is false", function() {
+          expect(res.getBody().success).to.equal(false);
+        });
+
+        test("message is Invalid or expired token", function() {
+          expect(res.getBody().message).to.equal("Invalid or expired token.");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

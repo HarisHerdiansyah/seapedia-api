@@ -10,22 +10,22 @@ import lombok.Data;
 
 @Data
 public class RegisterRequestDTO {
-    @NotBlank(message = "Username can't be empty.")
-    @Size(min = 8, max = 50, message = "Username must be at least 8 characters.")
+    @NotBlank(message = "Username cannot be empty.")
+    @Size(min = 8, max = 50, message = "Username must be between 8 and 50 characters.")
     private String username;
 
-    @NotBlank(message = "Email can't by empty.")
+    @NotBlank(message = "Email cannot be empty.")
     @Email
     private String email;
 
-    @NotBlank(message = "Password can't be empty.")
-    @Size(min = 8, max = 16, message = "Password must be around 8-16 characters.")
+    @NotBlank(message = "Password cannot be empty.")
+    @Size(min = 8, max = 16, message = "Password must be between 8 and 16 characters.")
     @Pattern(
             regexp = "^(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9]).*$",
-            message = "Password at least have one number, one special characters, and one capital letter."
+            message = "Password must contain at least one uppercase letter, one number, and one special character."
     )
     private String password;
 
-    @NotNull(message = "Role can't be empty, choose ADMIN or NON_ADMIN.")
+    @NotNull(message = "Role cannot be empty. Choose ADMIN or NON_ADMIN.")
     private UserRole role;
 }

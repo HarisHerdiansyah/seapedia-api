@@ -1,0 +1,39 @@
+info:
+  name: 05-select-active-role
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/{{AUTH_MODULE}}/non-admin-role"
+  body:
+    type: json
+    data: |-
+      {
+        "activeRole": "SELLER"
+      }
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzM4NCJ9.eyJyb2xlcyI6WyJBRE1JTiJdLCJ1c2VySWQiOiIwOTZhM2MyMS04NmJkLTQ2Y2MtYWUxNC0xYjE2ZTJjODBjNzciLCJzdWIiOiJzZWFwZWRpYV9hZG1pbjAxQGdtYWlsLmNvbSIsImp0aSI6IjFlMjY2NGI4LWY1ZTAtNDBlNC1hZTExLWQzYTRjOTRkYjI4NyIsImlhdCI6MTc4MjE4MDgyOCwiZXhwIjoxNzgyMTgxNzI4fQ.ZXDqML_7QSu33auKLHWn0lOxIk1mQhQ3Id-pxuKgy6mo5FGZCqC1DWTmCsdk6HH_
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 200 OK", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("success is true", function() {
+          expect(res.getBody().success).to.equal(true);
+        });
+
+        test("message is correct", function() {
+          expect(res.getBody().message).to.equal("Active role updated successfully.");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

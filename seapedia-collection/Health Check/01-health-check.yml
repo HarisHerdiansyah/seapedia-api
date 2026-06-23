@@ -1,0 +1,31 @@
+info:
+  name: 01-health-check
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{BASE_URL}}/health-check"
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 200 OK", function() {
+              expect(res.getStatus()).to.equal(200);
+        });
+
+        test("success is true", function() {
+          expect(res.getBody().success).to.equal(true);
+        });
+
+        test("message is Status Up", function() {
+          expect(res.getBody().message).to.equal("Status Up");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

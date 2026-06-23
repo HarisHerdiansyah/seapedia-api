@@ -1,0 +1,44 @@
+info:
+  name: 01-register-non-admin
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/{{AUTH_MODULE}}/register"
+  body:
+    type: json
+    data: |-
+      {
+        "username": "spring01",
+        "email": "spring01@gmail.com",
+        "password": "Nazhmi#16",
+        "role": "NON_ADMIN"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 201 Created", function() {
+          expect(res.getStatus()).to.equal(201);
+        });
+
+        test("success is true", function() {
+          expect(res.getBody().success).to.equal(true);
+        });
+
+        test("data contains id, username, email, role", function() {
+          const data = res.getBody().data;
+          expect(data).to.have.property("id");
+          expect(data.username).to.equal("spring01");
+          expect(data.email).to.equal("spring01@gmail.com");
+          expect(data.role).to.equal("NON_ADMIN");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -28,9 +28,11 @@ public class JwtUtility {
     @Value("${jwt.secret}")
     private String secret;
 
+    /** Access token expiration in milliseconds (default: 900000 = 15 minutes). */
     @Value("${jwt.access-token.expiration}")
     private Long atExp;
 
+    /** Refresh token expiration in milliseconds (default: 604800000 = 7 days). */
     @Value("${jwt.refresh-token.expiration}")
     private Long rtExp;
 
@@ -39,22 +41,22 @@ public class JwtUtility {
         return Keys.hmacShaKeyFor(secretBytes);
     }
 
-    private String generateToken(Map<String, Object> claims, UserDetails principal, long exp) {
+    private String generateToken(Map<String, Object> claims, UserDetails principal, long expMillis) {
         return Jwts.builder()
                 .claims(claims)
                 .subject(principal.getUsername())
                 .id(UUID.randomUUID().toString())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + exp * 1000))
+                .expiration(new Date(System.currentTimeMillis() + expMillis))
                 .signWith(getSignKey())
                 .compact();
     }
 
-    public String generateAt(Map<String, Object> claims, UserDetails principal) {
+    public String generateAccessToken(Map<String, Object> claims, UserDetails principal) {
         return generateToken(claims, principal, atExp);
     }
 
-    public String generateRt(Map<String, Object> claims, UserDetails principal) {
+    public String generateRefreshToken(Map<String, Object> claims, UserDetails principal) {
         return generateToken(claims, principal, rtExp);
     }
 
@@ -103,13 +105,13 @@ public class JwtUtility {
         return new UsernamePasswordAuthenticationToken(userPrincipal, null, authorities);
     }
 
-    public ResponseCookie cookieResponseBuilder(String refreshToken) {
-        boolean isRtExist = StringUtils.hasText(refreshToken);
-        return ResponseCookie.from("refreshToken", isRtExist ? refreshToken : "")
+    public ResponseCookie buildRefreshTokenCookie(String refreshToken) {
+        boolean hasToken = StringUtils.hasText(refreshToken);
+        return ResponseCookie.from("refreshToken", hasToken ? refreshToken : "")
                 .httpOnly(true)
-                .secure(false)
+                .secure(false)  // TODO: set true in production
                 .sameSite("Strict")
-                .maxAge(isRtExist ? rtExp : 0)
+                .maxAge(hasToken ? rtExp / 1000 : 0)  // maxAge expects seconds
                 .path("/")
                 .build();
     }

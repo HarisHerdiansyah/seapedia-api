@@ -1,0 +1,34 @@
+info:
+  name: 04-login-admin
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/{{AUTH_MODULE}}/login"
+  body:
+    type: json
+    data: |-
+      {
+        "email": "seapedia_admin01@gmail.com",
+        "password": "Admin#1234"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 200 OK", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("role is ADMIN", function() {
+          expect(res.getBody().data.userData.role).to.equal("ADMIN");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
