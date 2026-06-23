@@ -76,6 +76,12 @@ public class AuthenticationService {
                 .findFirst()
                 .orElseThrow(() -> new ForbiddenException("Unable to determine user role from token."));
 
+        ActiveRole requestedRole = getActiveRole(nonAdminRoleRequestDTO, userRole);
+
+        sessionService.updateActiveRoleSession(rtJti, requestedRole);
+    }
+
+    private static ActiveRole getActiveRole(NonAdminRoleRequestDTO nonAdminRoleRequestDTO, UserRole userRole) {
         ActiveRole requestedRole = nonAdminRoleRequestDTO.getActiveRole();
 
         if (userRole == UserRole.ADMIN) {
@@ -89,8 +95,7 @@ public class AuthenticationService {
                 throw new ForbiddenException("Non-admin users can only select BUYER, SELLER, or DRIVER as their active role.");
             }
         }
-
-        sessionService.updateActiveRoleSession(rtJti, requestedRole);
+        return requestedRole;
     }
 
     public Map<String, Object> refreshToken(String rt, String ipAddress, String deviceInfo) {
@@ -146,12 +151,13 @@ public class AuthenticationService {
         String refreshToken = jwtUtility.generateRefreshToken(tokenClaims, principal);
 
         UUID rtJti = UUID.fromString(jwtUtility.extractJti(refreshToken));
-        CreateSessionDTO sessionDTO = new CreateSessionDTO(rtJti, principal.getUserId(), deviceInfo, ipAddress, ActiveRole.NON_ADMIN);
+        UserRole role = authorities.stream().map(UserRole::valueOf).findFirst().orElse(UserRole.NON_ADMIN);
+        boolean isAdmin = role == UserRole.ADMIN;
+
+        CreateSessionDTO sessionDTO = new CreateSessionDTO(rtJti, principal.getUserId(), deviceInfo, ipAddress, isAdmin ? ActiveRole.ADMIN : ActiveRole.NON_ADMIN);
         sessionService.createSession(sessionDTO);
 
         String cookieResponse = jwtUtility.buildRefreshTokenCookie(refreshToken).toString();
-
-        UserRole role = authorities.stream().map(UserRole::valueOf).findFirst().orElse(UserRole.NON_ADMIN);
         LoginResponseDTO.UserObject userObject = new LoginResponseDTO.UserObject(
                 principal.getUserId(), principal.getDisplayName(), principal.getUsername(), role
         );

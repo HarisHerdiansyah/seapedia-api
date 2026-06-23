@@ -10,9 +10,9 @@ http:
     type: json
     data: |-
       {
-        "username": "adminuser01",
-        "email": "admin01@example.com",
-        "password": "AdminPass1!",
+        "username": "seapedia admin",
+        "email": "seapedia_admin01@gmail.com",
+        "password": "Admin#1234",
         "role": "ADMIN"
       }
   auth: inherit

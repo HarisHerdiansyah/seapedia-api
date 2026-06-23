@@ -10,19 +10,13 @@ http:
     type: json
     data: |-
       {
-        "email": "testuser01@example.com",
-        "password": "Password1!"
+        "email": "spring01@gmail.com",
+        "password": "Nazhmi#16"
       }
   auth: inherit
 
 runtime:
   scripts:
-    - type: post-response
-      code: |-
-        if (res.getStatus() === 200) {
-          const token = res.getBody().data.accessToken;
-          bru.setEnvVar("ACCESS_TOKEN", token);
-        }
     - type: tests
       code: |-
         test("Status is 200 OK", function() {

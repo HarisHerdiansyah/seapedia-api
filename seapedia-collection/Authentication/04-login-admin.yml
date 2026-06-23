@@ -10,19 +10,13 @@ http:
     type: json
     data: |-
       {
-        "email": "admin01@example.com",
-        "password": "AdminPass1!"
+        "email": "seapedia_admin01@gmail.com",
+        "password": "Admin#1234"
       }
   auth: inherit
 
 runtime:
   scripts:
-    - type: post-response
-      code: |-
-        if (res.getStatus() === 200) {
-          const token = res.getBody().data.accessToken;
-          bru.setEnvVar("ACCESS_TOKEN", token);
-        }
     - type: tests
       code: |-
         test("Status is 200 OK", function() {

@@ -10,9 +10,9 @@ http:
     type: json
     data: |-
       {
-        "username": "testuser01",
-        "email": "testuser01@example.com",
-        "password": "Password1!",
+        "username": "spring01",
+        "email": "spring01@gmail.com",
+        "password": "Nazhmi#16",
         "role": "NON_ADMIN"
       }
   auth: inherit
@@ -32,8 +32,8 @@ runtime:
         test("data contains id, username, email, role", function() {
           const data = res.getBody().data;
           expect(data).to.have.property("id");
-          expect(data.username).to.equal("testuser01");
-          expect(data.email).to.equal("testuser01@example.com");
+          expect(data.username).to.equal("spring01");
+          expect(data.email).to.equal("spring01@gmail.com");
           expect(data.role).to.equal("NON_ADMIN");
         });
 

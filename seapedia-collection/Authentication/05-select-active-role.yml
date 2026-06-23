@@ -10,9 +10,11 @@ http:
     type: json
     data: |-
       {
-        "activeRole": "BUYER"
+        "activeRole": "SELLER"
       }
-  auth: inherit
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzM4NCJ9.eyJyb2xlcyI6WyJBRE1JTiJdLCJ1c2VySWQiOiIwOTZhM2MyMS04NmJkLTQ2Y2MtYWUxNC0xYjE2ZTJjODBjNzciLCJzdWIiOiJzZWFwZWRpYV9hZG1pbjAxQGdtYWlsLmNvbSIsImp0aSI6IjFlMjY2NGI4LWY1ZTAtNDBlNC1hZTExLWQzYTRjOTRkYjI4NyIsImlhdCI6MTc4MjE4MDgyOCwiZXhwIjoxNzgyMTgxNzI4fQ.ZXDqML_7QSu33auKLHWn0lOxIk1mQhQ3Id-pxuKgy6mo5FGZCqC1DWTmCsdk6HH_
 
 runtime:
   scripts:
