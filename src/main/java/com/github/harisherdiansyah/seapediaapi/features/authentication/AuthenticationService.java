@@ -4,9 +4,11 @@ import com.github.harisherdiansyah.seapediaapi.core.exception.DuplicateDataExcep
 import com.github.harisherdiansyah.seapediaapi.core.exception.ForbiddenException;
 import com.github.harisherdiansyah.seapediaapi.core.exception.NotFoundException;
 import com.github.harisherdiansyah.seapediaapi.core.utils.JwtUtility;
+import com.github.harisherdiansyah.seapediaapi.features.drivers.DriverService;
 import com.github.harisherdiansyah.seapediaapi.features.session.ActiveRole;
 import com.github.harisherdiansyah.seapediaapi.features.session.CreateSessionDTO;
 import com.github.harisherdiansyah.seapediaapi.features.session.SessionService;
+import com.github.harisherdiansyah.seapediaapi.features.stores.StoreService;
 import com.github.harisherdiansyah.seapediaapi.features.users.UserRole;
 import com.github.harisherdiansyah.seapediaapi.features.users.UserService;
 import lombok.RequiredArgsConstructor;
@@ -18,17 +20,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
     private final UserService userService;
     private final SessionService sessionService;
+    private final StoreService storeService;
+    private final DriverService driverService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtility jwtUtility;
     private final AuthenticationManager authenticationManager;
@@ -137,6 +137,34 @@ public class AuthenticationService {
         return clearedCookie;
     }
 
+    private Map<String, Object> buildAuthResponse(UserPrincipalEntity principal, UserRole role, String at, String rt) {
+        List<ActiveRole> allowedAs = new ArrayList<>();
+        boolean isAdmin = role == UserRole.ADMIN;
+        boolean isSeller = storeService.isStoreExistByUserId(principal.getUserId());
+        boolean isDriver = driverService.isDriverExistByUserId(principal.getUserId());
+        if (!isAdmin) {
+            if (isSeller) allowedAs.add(ActiveRole.SELLER);
+            if (isDriver) allowedAs.add(ActiveRole.DRIVER);
+            allowedAs.add(ActiveRole.BUYER);
+        }
+
+        String cookieResponse = jwtUtility.buildRefreshTokenCookie(rt).toString();
+        LoginResponseDTO.UserObject userObject = new LoginResponseDTO.UserObject(
+                principal.getUserId(),
+                principal.getDisplayName(),
+                principal.getUsername(),
+                role,
+                allowedAs
+        );
+
+        LoginResponseDTO loginResponseDTO = new LoginResponseDTO(at, userObject);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("loginResponse", loginResponseDTO);
+        result.put("cookieResponse", cookieResponse);
+        return result;
+    }
+
     private Map<String, Object> buildSessionAndTokens(UserPrincipalEntity principal, String ipAddress, String deviceInfo) {
         List<String> authorities = principal.getAuthorities()
                 .stream()
@@ -157,16 +185,6 @@ public class AuthenticationService {
         CreateSessionDTO sessionDTO = new CreateSessionDTO(rtJti, principal.getUserId(), deviceInfo, ipAddress, isAdmin ? ActiveRole.ADMIN : ActiveRole.NON_ADMIN);
         sessionService.createSession(sessionDTO);
 
-        String cookieResponse = jwtUtility.buildRefreshTokenCookie(refreshToken).toString();
-        LoginResponseDTO.UserObject userObject = new LoginResponseDTO.UserObject(
-                principal.getUserId(), principal.getDisplayName(), principal.getUsername(), role
-        );
-
-        LoginResponseDTO loginResponseDTO = new LoginResponseDTO(accessToken, userObject);
-
-        Map<String, Object> result = new HashMap<>();
-        result.put("loginResponse", loginResponseDTO);
-        result.put("cookieResponse", cookieResponse);
-        return result;
+        return buildAuthResponse(principal, role, accessToken, refreshToken);
     }
 }
