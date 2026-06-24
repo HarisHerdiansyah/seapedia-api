@@ -43,9 +43,9 @@ public class AuthenticationController {
     public ResponseEntity<?> nonAdminRoleController(
             @Valid @RequestBody NonAdminRoleRequestDTO nonAdminRoleRequestDTO,
             @CookieValue(name = "refreshToken", defaultValue = "") String rt) {
-        authenticationService.selectActiveRole(nonAdminRoleRequestDTO, rt);
+        NonAdminRoleResponseDTO responseDTO =  authenticationService.selectActiveRole(nonAdminRoleRequestDTO, rt);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(ApiResponse.success(HttpStatus.OK.value(), "Active role updated successfully.", null));
+                .body(ApiResponse.success(HttpStatus.OK.value(), "Active role updated successfully.", responseDTO));
     }
 
     @PostMapping("/refresh-token")

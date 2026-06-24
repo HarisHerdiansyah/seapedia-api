@@ -62,7 +62,7 @@ public class AuthenticationService {
         return buildSessionAndTokens(principal, ipAddress, deviceInfo);
     }
 
-    public void selectActiveRole(NonAdminRoleRequestDTO nonAdminRoleRequestDTO, String rt) {
+    public NonAdminRoleResponseDTO selectActiveRole(NonAdminRoleRequestDTO nonAdminRoleRequestDTO, String rt) {
         if (!StringUtils.hasText(rt)) {
             throw new ForbiddenException("Refresh token is missing.");
         }
@@ -79,6 +79,7 @@ public class AuthenticationService {
         ActiveRole requestedRole = getActiveRole(nonAdminRoleRequestDTO, userRole);
 
         sessionService.updateActiveRoleSession(rtJti, requestedRole);
+        return new NonAdminRoleResponseDTO(requestedRole);
     }
 
     private static ActiveRole getActiveRole(NonAdminRoleRequestDTO nonAdminRoleRequestDTO, UserRole userRole) {
