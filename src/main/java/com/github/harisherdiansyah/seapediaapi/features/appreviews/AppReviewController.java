@@ -20,6 +20,6 @@ public class AppReviewController {
     public ResponseEntity<?> submitAppReview(@Valid @RequestBody AppReviewRequestDTO appReviewRequestDTO) {
         appReviewService.submitAppReview(appReviewRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(HttpStatus.CREATED.value(), "Review submitted successfully..", null));
+                .body(ApiResponse.success(HttpStatus.CREATED.value(), "Review submitted successfully.", null));
     }
 }

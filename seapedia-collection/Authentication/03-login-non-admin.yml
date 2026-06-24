@@ -10,13 +10,19 @@ http:
     type: json
     data: |-
       {
-        "email": "spring01@gmail.com",
-        "password": "Nazhmi#16"
+        "email": "testuser01@example.com",
+        "password": "Password1!"
       }
   auth: inherit
 
 runtime:
   scripts:
+    - type: post-response
+      code: |-
+        if (res.getStatus() === 200) {
+          const token = res.getBody().data.accessToken;
+          bru.setEnvVar("ACCESS_TOKEN", token);
+        }
     - type: tests
       code: |-
         test("Status is 200 OK", function() {
@@ -35,6 +41,12 @@ runtime:
           const userData = res.getBody().data.userData;
           expect(userData).to.have.property("id");
           expect(userData.role).to.equal("NON_ADMIN");
+        });
+
+        test("userData.allowedAs is an array containing BUYER", function() {
+          const allowedAs = res.getBody().data.userData.allowedAs;
+          expect(allowedAs).to.be.an("array");
+          expect(allowedAs).to.include("BUYER");
         });
 
 settings:

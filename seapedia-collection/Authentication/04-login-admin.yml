@@ -10,13 +10,19 @@ http:
     type: json
     data: |-
       {
-        "email": "seapedia_admin01@gmail.com",
-        "password": "Admin#1234"
+        "email": "admin01@example.com",
+        "password": "AdminPass1!"
       }
   auth: inherit
 
 runtime:
   scripts:
+    - type: post-response
+      code: |-
+        if (res.getStatus() === 200) {
+          const token = res.getBody().data.accessToken;
+          bru.setEnvVar("ACCESS_TOKEN", token);
+        }
     - type: tests
       code: |-
         test("Status is 200 OK", function() {
@@ -25,6 +31,11 @@ runtime:
 
         test("role is ADMIN", function() {
           expect(res.getBody().data.userData.role).to.equal("ADMIN");
+        });
+
+        test("userData.allowedAs is empty for ADMIN", function() {
+          const allowedAs = res.getBody().data.userData.allowedAs;
+          expect(allowedAs).to.be.an("array").that.is.empty;
         });
 
 settings:

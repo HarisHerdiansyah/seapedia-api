@@ -5,3 +5,5 @@ variables:
     value: http://localhost:8080/api
   - name: AUTH_MODULE
     value: authentication
+  - name: APP_REVIEW_MODULE
+    value: app-review

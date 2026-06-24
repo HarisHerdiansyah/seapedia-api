@@ -30,6 +30,10 @@ runtime:
           expect(res.getBody().message).to.equal("Token refreshed successfully.");
         });
 
+        test("userData.allowedAs is an array", function() {
+          expect(res.getBody().data.userData.allowedAs).to.be.an("array");
+        });
+
 settings:
   encodeUrl: true
   timeout: 0

@@ -1,0 +1,39 @@
+info:
+  name: 03-submit-empty-content
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/{{APP_REVIEW_MODULE}}"
+  body:
+    type: json
+    data: |-
+      {
+        "reviewer": "John Doe",
+        "rating": 4.5,
+        "content": ""
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 400 Bad Request", function() {
+          expect(res.getStatus()).to.equal(400);
+        });
+
+        test("success is false", function() {
+          expect(res.getBody().success).to.equal(false);
+        });
+
+        test("message mentions content cannot be empty", function() {
+          expect(res.getBody().message).to.include("App review content cannot be empty");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

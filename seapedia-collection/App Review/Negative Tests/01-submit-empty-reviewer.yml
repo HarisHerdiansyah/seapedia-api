@@ -1,0 +1,39 @@
+info:
+  name: 01-submit-empty-reviewer
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/{{APP_REVIEW_MODULE}}"
+  body:
+    type: json
+    data: |-
+      {
+        "reviewer": "",
+        "rating": 4.5,
+        "content": "Aplikasi yang bagus!"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 400 Bad Request", function() {
+          expect(res.getStatus()).to.equal(400);
+        });
+
+        test("success is false", function() {
+          expect(res.getBody().success).to.equal(false);
+        });
+
+        test("message mentions reviewer cannot be empty", function() {
+          expect(res.getBody().message).to.include("App reviewer cannot be empty");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

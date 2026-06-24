@@ -10,11 +10,9 @@ http:
     type: json
     data: |-
       {
-        "activeRole": "SELLER"
+        "activeRole": "BUYER"
       }
-  auth:
-    type: bearer
-    token: eyJhbGciOiJIUzM4NCJ9.eyJyb2xlcyI6WyJBRE1JTiJdLCJ1c2VySWQiOiIwOTZhM2MyMS04NmJkLTQ2Y2MtYWUxNC0xYjE2ZTJjODBjNzciLCJzdWIiOiJzZWFwZWRpYV9hZG1pbjAxQGdtYWlsLmNvbSIsImp0aSI6IjFlMjY2NGI4LWY1ZTAtNDBlNC1hZTExLWQzYTRjOTRkYjI4NyIsImlhdCI6MTc4MjE4MDgyOCwiZXhwIjoxNzgyMTgxNzI4fQ.ZXDqML_7QSu33auKLHWn0lOxIk1mQhQ3Id-pxuKgy6mo5FGZCqC1DWTmCsdk6HH_
+  auth: inherit
 
 runtime:
   scripts:
@@ -30,6 +28,10 @@ runtime:
 
         test("message is correct", function() {
           expect(res.getBody().message).to.equal("Active role updated successfully.");
+        });
+
+        test("data.activeRole is BUYER", function() {
+          expect(res.getBody().data.activeRole).to.equal("BUYER");
         });
 
 settings:
