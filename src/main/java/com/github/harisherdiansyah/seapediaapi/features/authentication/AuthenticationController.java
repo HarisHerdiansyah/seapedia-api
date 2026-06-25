@@ -45,7 +45,6 @@ public class AuthenticationController {
     public ResponseEntity<?> selectActiveRoleController(
             @Valid @RequestBody NonAdminRoleRequestDTO nonAdminRoleRequestDTO,
             @CookieValue(name = "refreshToken", defaultValue = "") String rt) {
-        System.out.println("requestnya masuk bang");
         NonAdminRoleResponseDTO responseDTO =  authenticationService.selectActiveRole(nonAdminRoleRequestDTO, rt);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.success(HttpStatus.OK.value(), "Active role updated successfully.", responseDTO));
