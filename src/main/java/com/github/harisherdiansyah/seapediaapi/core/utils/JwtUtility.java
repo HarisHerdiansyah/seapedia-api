@@ -41,23 +41,25 @@ public class JwtUtility {
         return Keys.hmacShaKeyFor(secretBytes);
     }
 
-    private String generateToken(Map<String, Object> claims, UserDetails principal, long expMillis) {
+    public String generateAccessToken(Map<String, Object> claims, String tokenId, String tokenSubject) {
         return Jwts.builder()
                 .claims(claims)
-                .subject(principal.getUsername())
-                .id(UUID.randomUUID().toString())
+                .subject(tokenSubject)
+                .id(tokenId)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expMillis))
+                .expiration(new Date(System.currentTimeMillis() + atExp))
                 .signWith(getSignKey())
                 .compact();
     }
 
-    public String generateAccessToken(Map<String, Object> claims, UserDetails principal) {
-        return generateToken(claims, principal, atExp);
-    }
-
-    public String generateRefreshToken(Map<String, Object> claims, UserDetails principal) {
-        return generateToken(claims, principal, rtExp);
+    public String generateRefreshToken(String tokenId, String tokenSubject) {
+        return Jwts.builder()
+                .subject(tokenSubject)
+                .id(tokenId)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + rtExp))
+                .signWith(getSignKey())
+                .compact();
     }
 
     public Claims extractAllClaims(String token) {
@@ -85,23 +87,27 @@ public class JwtUtility {
         return UUID.fromString(extractClaim(token, claims -> claims.get("userId", String.class)));
     }
 
-    public List<String> extractRoles(String token) {
-        return extractClaim(token, claims -> claims.get("roles", List.class));
+    public String extractRoles(String token) {
+        return extractClaim(token, claims -> claims.get("role", String.class));
     }
 
-    public Authentication getAuthentication(String token) {
-        List<GrantedAuthority> authorities = extractRoles(token)
-                .stream()
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
-
+    public Authentication buildAuthToken(String token, List<GrantedAuthority> authorities) {
         UserPrincipalEntity userPrincipal = UserPrincipalEntity.builder()
                 .userId(extractUserId(token))
                 .username(extractSubject(token))
                 .password("")
                 .authorities(authorities)
                 .build();
+        return new UsernamePasswordAuthenticationToken(userPrincipal, null, authorities);
+    }
 
+    public Authentication buildAuthToken(UUID userId, String tokenSubject, List<GrantedAuthority> authorities) {
+        UserPrincipalEntity userPrincipal = UserPrincipalEntity.builder()
+                .userId(userId)
+                .username(tokenSubject)
+                .password("")
+                .authorities(authorities)
+                .build();
         return new UsernamePasswordAuthenticationToken(userPrincipal, null, authorities);
     }
 
@@ -111,7 +117,7 @@ public class JwtUtility {
                 .httpOnly(true)
                 .secure(false)  // TODO: set true in production
                 .sameSite("Strict")
-                .maxAge(hasToken ? rtExp / 1000 : 0)  // maxAge expects seconds
+                .maxAge(hasToken ? rtExp / 1000 : 0)
                 .path("/")
                 .build();
     }

@@ -43,6 +43,11 @@ public class SessionService {
         sessionRepository.deleteById(jti);
     }
 
+    public UserSessionInfo getUserSessionInfo(UUID jti) {
+        return sessionRepository.findUserSessionInfoBySessionId(jti)
+                .orElseThrow(() -> new NotFoundException("Session not found."));
+    }
+
     /**
      * Cleans up sessions that have passed their expiry time.
      * Runs every hour to keep the sessions table lean.
