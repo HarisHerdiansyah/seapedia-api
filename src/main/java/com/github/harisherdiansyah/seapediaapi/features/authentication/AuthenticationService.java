@@ -8,6 +8,7 @@ import com.github.harisherdiansyah.seapediaapi.features.drivers.DriverService;
 import com.github.harisherdiansyah.seapediaapi.features.session.ActiveRole;
 import com.github.harisherdiansyah.seapediaapi.features.session.CreateSessionDTO;
 import com.github.harisherdiansyah.seapediaapi.features.session.SessionService;
+import com.github.harisherdiansyah.seapediaapi.features.session.UserSessionInfo;
 import com.github.harisherdiansyah.seapediaapi.features.stores.StoreService;
 import com.github.harisherdiansyah.seapediaapi.features.users.UserRole;
 import com.github.harisherdiansyah.seapediaapi.features.users.UserService;
@@ -33,11 +34,6 @@ public class AuthenticationService {
     private final JwtUtility jwtUtility;
     private final AuthenticationManager authenticationManager;
 
-    /** Active roles that NON_ADMIN users are permitted to select. */
-    private static final Set<ActiveRole> NON_ADMIN_ALLOWED_ROLES = Set.of(
-            ActiveRole.BUYER, ActiveRole.SELLER, ActiveRole.DRIVER
-    );
-
     public RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO) {
         boolean isUserExist = userService.isUserExistByUsername(registerRequestDTO.getUsername());
         if (isUserExist) {
@@ -55,9 +51,10 @@ public class AuthenticationService {
     }
 
     public Map<String, Object> login(LoginRequestDTO loginRequestDTO, String ipAddress, String deviceInfo) {
-        Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequestDTO.getEmail(), loginRequestDTO.getPassword())
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                loginRequestDTO.getEmail(), loginRequestDTO.getPassword()
         );
+        Authentication auth = authenticationManager.authenticate(token);
         UserPrincipalEntity principal = (UserPrincipalEntity) auth.getPrincipal();
         return buildSessionAndTokens(principal, ipAddress, deviceInfo);
     }
@@ -67,36 +64,19 @@ public class AuthenticationService {
             throw new ForbiddenException("Refresh token is missing.");
         }
 
-        UUID rtJti = UUID.fromString(jwtUtility.extractJti(rt));
-
-        // Determine user's base role from the refresh token claims
-        List<String> roles = jwtUtility.extractRoles(rt);
-        UserRole userRole = roles.stream()
-                .map(UserRole::valueOf)
-                .findFirst()
-                .orElseThrow(() -> new ForbiddenException("Unable to determine user role from token."));
-
-        ActiveRole requestedRole = getActiveRole(nonAdminRoleRequestDTO, userRole);
-
-        sessionService.updateActiveRoleSession(rtJti, requestedRole);
-        return new NonAdminRoleResponseDTO(requestedRole);
-    }
-
-    private static ActiveRole getActiveRole(NonAdminRoleRequestDTO nonAdminRoleRequestDTO, UserRole userRole) {
+        UUID currentTokenJti = UUID.fromString(jwtUtility.extractJti(rt));
         ActiveRole requestedRole = nonAdminRoleRequestDTO.getActiveRole();
 
-        if (userRole == UserRole.ADMIN) {
-            // ADMIN can only re-select ADMIN
-            if (requestedRole != ActiveRole.ADMIN) {
-                throw new ForbiddenException("Admin users can only select the ADMIN role.");
-            }
-        } else {
-            // NON_ADMIN can only select BUYER, SELLER, or DRIVER
-            if (!NON_ADMIN_ALLOWED_ROLES.contains(requestedRole)) {
-                throw new ForbiddenException("Non-admin users can only select BUYER, SELLER, or DRIVER as their active role.");
-            }
-        }
-        return requestedRole;
+        UserSessionInfo userSessionInfo = sessionService.getUserSessionInfo(currentTokenJti);
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userSessionInfo.getId());
+        claims.put("role", requestedRole.toString());
+
+        String accessToken = jwtUtility.generateAccessToken(claims, currentTokenJti.toString(), userSessionInfo.getEmail());
+
+        sessionService.updateActiveRoleSession(currentTokenJti, requestedRole);
+        return new NonAdminRoleResponseDTO(requestedRole, accessToken);
     }
 
     public Map<String, Object> refreshToken(String rt, String ipAddress, String deviceInfo) {
@@ -104,15 +84,23 @@ public class AuthenticationService {
             throw new ForbiddenException("Refresh token is missing.");
         }
 
-        UUID rtJti = UUID.fromString(jwtUtility.extractJti(rt));
-        if (!sessionService.isSessionExist(rtJti)) {
+        UUID currentTokenJti = UUID.fromString(jwtUtility.extractJti(rt));
+        if (!sessionService.isSessionExist(currentTokenJti)) {
             throw new ForbiddenException("Session not found. Please re-login.");
         }
 
-        sessionService.deleteSession(rtJti);
+        UserSessionInfo userSessionInfo = sessionService.getUserSessionInfo(currentTokenJti);
+        sessionService.deleteSession(currentTokenJti);
 
-        Authentication auth = jwtUtility.getAuthentication(rt);
-        UserPrincipalEntity principal = (UserPrincipalEntity) auth.getPrincipal();
+        UUID userId = userSessionInfo.getId();
+        String activeRoleStr = String.valueOf(userSessionInfo.getActiveRole());
+        String email = userSessionInfo.getEmail();
+
+        ActiveRole activeRole = ActiveRole.valueOf(activeRoleStr);
+        List<GrantedAuthority> authorities = activeRole.getAuthorities();
+
+        Authentication authToken = jwtUtility.buildAuthToken(userId, email, authorities);
+        UserPrincipalEntity principal = (UserPrincipalEntity) authToken.getPrincipal();
         return buildSessionAndTokens(principal, ipAddress, deviceInfo);
     }
 
@@ -138,12 +126,12 @@ public class AuthenticationService {
         return clearedCookie;
     }
 
-    private Map<String, Object> buildAuthResponse(UserPrincipalEntity principal, UserRole role, String at, String rt) {
+    private Map<String, Object> buildAuthResponse(UserPrincipalEntity principal, String at, String rt) {
         List<ActiveRole> allowedAs = new ArrayList<>();
-        boolean isAdmin = role == UserRole.ADMIN;
+        boolean isNonAdmin = UserRole.NON_ADMIN.toString().equals(principal.getUserRole()); // well-known as public user
         boolean isSeller = storeService.isStoreExistByUserId(principal.getUserId());
         boolean isDriver = driverService.isDriverExistByUserId(principal.getUserId());
-        if (!isAdmin) {
+        if (isNonAdmin) {
             if (isSeller) allowedAs.add(ActiveRole.SELLER);
             if (isDriver) allowedAs.add(ActiveRole.DRIVER);
             allowedAs.add(ActiveRole.BUYER);
@@ -154,7 +142,7 @@ public class AuthenticationService {
                 principal.getUserId(),
                 principal.getDisplayName(),
                 principal.getUsername(),
-                role,
+                UserRole.valueOf(principal.getUserRole()),
                 allowedAs
         );
 
@@ -167,25 +155,22 @@ public class AuthenticationService {
     }
 
     private Map<String, Object> buildSessionAndTokens(UserPrincipalEntity principal, String ipAddress, String deviceInfo) {
-        List<String> authorities = principal.getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
-
         Map<String, Object> tokenClaims = new HashMap<>();
         tokenClaims.put("userId", principal.getUserId());
-        tokenClaims.put("roles", authorities);  // key must match JwtUtility.extractRoles()
+        tokenClaims.put("role", principal.getUserRole());
 
-        String accessToken = jwtUtility.generateAccessToken(tokenClaims, principal);
-        String refreshToken = jwtUtility.generateRefreshToken(tokenClaims, principal);
+        UUID tokenJti = UUID.randomUUID();
+        String tokenJtiString = tokenJti.toString();
+        String tokenSubject = principal.getUsername();
+        String accessToken = jwtUtility.generateAccessToken(tokenClaims, tokenJtiString, tokenSubject);
+        String refreshToken = jwtUtility.generateRefreshToken(tokenJtiString, tokenSubject);
 
-        UUID rtJti = UUID.fromString(jwtUtility.extractJti(refreshToken));
-        UserRole role = authorities.stream().map(UserRole::valueOf).findFirst().orElse(UserRole.NON_ADMIN);
-        boolean isAdmin = role == UserRole.ADMIN;
+        boolean isAdmin = UserRole.ADMIN.toString().equals(principal.getUserRole());
+        ActiveRole sessionActiveRole = isAdmin ? ActiveRole.ADMIN : ActiveRole.NON_ADMIN;
 
-        CreateSessionDTO sessionDTO = new CreateSessionDTO(rtJti, principal.getUserId(), deviceInfo, ipAddress, isAdmin ? ActiveRole.ADMIN : ActiveRole.NON_ADMIN);
+        CreateSessionDTO sessionDTO = new CreateSessionDTO(tokenJti, principal.getUserId(), deviceInfo, ipAddress, sessionActiveRole);
         sessionService.createSession(sessionDTO);
 
-        return buildAuthResponse(principal, role, accessToken, refreshToken);
+        return buildAuthResponse(principal, accessToken, refreshToken);
     }
 }

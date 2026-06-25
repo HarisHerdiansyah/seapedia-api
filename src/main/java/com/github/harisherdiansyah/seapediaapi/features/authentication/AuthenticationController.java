@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -39,10 +40,12 @@ public class AuthenticationController {
                 .body(ApiResponse.success(HttpStatus.OK.value(), "Login successful.", loginResponse));
     }
 
-    @PostMapping("/non-admin-role")
-    public ResponseEntity<?> nonAdminRoleController(
+    @PreAuthorize("hasAuthority('SELECT_ROLE') and hasRole('NON_ADMIN')")
+    @PostMapping("/select-active-role")
+    public ResponseEntity<?> selectActiveRoleController(
             @Valid @RequestBody NonAdminRoleRequestDTO nonAdminRoleRequestDTO,
             @CookieValue(name = "refreshToken", defaultValue = "") String rt) {
+        System.out.println("requestnya masuk bang");
         NonAdminRoleResponseDTO responseDTO =  authenticationService.selectActiveRole(nonAdminRoleRequestDTO, rt);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.success(HttpStatus.OK.value(), "Active role updated successfully.", responseDTO));

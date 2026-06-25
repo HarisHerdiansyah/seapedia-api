@@ -1,6 +1,7 @@
 package com.github.harisherdiansyah.seapediaapi.features.authentication;
 
 import com.github.harisherdiansyah.seapediaapi.core.exception.NotFoundException;
+import com.github.harisherdiansyah.seapediaapi.features.session.ActiveRole;
 import com.github.harisherdiansyah.seapediaapi.features.users.UserEntity;
 import com.github.harisherdiansyah.seapediaapi.features.users.UserService;
 import lombok.RequiredArgsConstructor;
@@ -19,27 +20,20 @@ import java.util.stream.Collectors;
 public class UserPrincipalService implements UserDetailsService {
     private final UserService userService;
 
-    /**
-     * Loads user by email. Spring Security uses "username" generically,
-     * but in this system the login identifier is the email.
-     */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         try {
             UserEntity user = userService.getUserByEmail(email);
-
-            List<String> role = List.of(user.getRole().toString());
-            List<GrantedAuthority> authorities = role
-                    .stream()
-                    .map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toList());
+            String userRole = user.getRole().toString();
+            ActiveRole activeRole = ActiveRole.valueOf(userRole);
 
             return UserPrincipalEntity.builder()
                     .userId(user.getId())
                     .username(user.getEmail())
                     .displayName(user.getUsername())
+                    .userRole(userRole)
                     .password(user.getPasswordHash())
-                    .authorities(authorities)
+                    .authorities(activeRole.getAuthorities())
                     .build();
         } catch (NotFoundException e) {
             throw new UsernameNotFoundException("User with email " + email + " not found.");

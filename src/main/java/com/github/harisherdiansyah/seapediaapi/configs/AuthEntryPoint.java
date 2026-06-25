@@ -27,7 +27,7 @@ public class AuthEntryPoint implements AuthenticationEntryPoint {
         Map<String, Object> errorResponse = new HashMap<>();
         errorResponse.put("status", 401);
         errorResponse.put("success", false);
-        errorResponse.put("message", "Authentication is required.");
+        errorResponse.put("message", authException.getMessage());
         errorResponse.put("data", null);
 
         response.getWriter().write(objectMapper.writeValueAsString(errorResponse));

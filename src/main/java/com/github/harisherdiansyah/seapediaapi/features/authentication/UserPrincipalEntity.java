@@ -15,25 +15,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserPrincipalEntity implements UserDetails {
     private final UUID userId;
-
-    /**
-     * Stores the user's email, used as the Spring Security login identifier.
-     * Maps to {@code UserEntity.email}.
-     */
     private final String username;
-
-    /**
-     * Display name (actual username), used for UI representation.
-     * Maps to {@code UserEntity.username}.
-     * May be {@code null} when principal is reconstructed from a JWT token.
-     */
     private final String displayName;
-
-    /**
-     * Hashed password. May be {@code null} when principal is reconstructed from a JWT token.
-     */
+    private final String userRole;
     private final String password;
-
     private final List<GrantedAuthority> authorities;
 
     @Override
