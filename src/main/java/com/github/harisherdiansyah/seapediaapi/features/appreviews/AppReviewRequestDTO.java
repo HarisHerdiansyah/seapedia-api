@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 
 @Data
 public class AppReviewRequestDTO {
-    @NotBlank(message = "App reviewer cannot be empty.")
+    @NotNull(message = "App reviewer cannot be null.")
     private String reviewer;
 
     @NotNull(message = "App rating cannot be empty.")

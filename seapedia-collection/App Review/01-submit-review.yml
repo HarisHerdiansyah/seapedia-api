@@ -10,7 +10,7 @@ http:
     type: json
     data: |-
       {
-        "reviewer": "John Doe",
+        "reviewer": "",
         "rating": 4.5,
         "content": "Aplikasi yang sangat bagus dan mudah digunakan!"
       }
