@@ -1,11 +1,11 @@
 package com.github.harisherdiansyah.seapediaapi.features.products;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -13,9 +13,7 @@ import java.util.List;
 public class ProductService {
     private final ProductRepository productRepository;
 
-    public ProductResponseDTO getAllProducts(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-
+    public ProductResponseDTO getAllProducts(Pageable pageable, String category, BigDecimal minPrice, BigDecimal maxPrice) {
         Slice<ProductData> productSlice = productRepository.findProductSlices(pageable);
         int pageNumber = productSlice.getNumber();
         boolean hasNext = productSlice.hasNext();
