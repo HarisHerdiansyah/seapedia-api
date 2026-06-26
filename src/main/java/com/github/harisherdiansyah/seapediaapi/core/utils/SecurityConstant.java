@@ -2,12 +2,19 @@ package com.github.harisherdiansyah.seapediaapi.core.utils;
 
 public class SecurityConstant {
     public static String[] PUBLIC_GET_ENDPOINTS = {
-            "/api/health-check/**",
+            "/api/health-check",
+            "/api/categories",
+            "/api/products/**"
     };
     public static String[] PUBLIC_POST_ENDPOINTS = {
-            "/api/app-review/**",
+            "/api/app-review",
             "/api/authentication/login",
             "/api/authentication/register",
-            "/api/authentication/reset-password",
+            "/api/authentication/refresh-token",
+            "/api/authentication/logout",
+            "/api/app-review"
+    };
+    public static String[] PUBLIC_PATCH_ENDPOINTS = {
+            "/api/authentication/reset-password"
     };
 }

@@ -65,6 +65,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, SecurityConstant.PUBLIC_GET_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.POST, SecurityConstant.PUBLIC_POST_ENDPOINTS).permitAll()
+                        .requestMatchers(HttpMethod.PATCH, SecurityConstant.PUBLIC_PATCH_ENDPOINTS).permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtFilterChain, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(authenticationEntryPoint))
