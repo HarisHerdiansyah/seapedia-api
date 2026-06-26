@@ -1,4 +1,4 @@
-name: Local Env
+name: Seapedia Local Env
 color: "#72c9d8"
 variables:
   - name: BASE_URL
@@ -7,3 +7,7 @@ variables:
     value: authentication
   - name: APP_REVIEW_MODULE
     value: app-review
+  - name: CATEGORY_MODULE
+    value: categories
+  - name: PRODUCT_MODULE
+    value: products

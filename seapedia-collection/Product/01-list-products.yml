@@ -1,0 +1,24 @@
+info:
+  name: 01-list-products
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{BASE_URL}}/{{PRODUCT_MODULE}}?page=0&size=10"
+  params:
+    - name: page
+      value: "0"
+      type: query
+    - name: size
+      value: "10"
+      type: query
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzM4NCJ9.eyJyb2xlIjoiTk9OX0FETUlOIiwidXNlcklkIjoiYzVhNGMwMTQtYmUzNi00MGZkLTg1YTEtN2JmOGMxY2M3ODlkIiwic3ViIjoiWXVsaWFfQXFpbGFAeWFob28uY29tIiwianRpIjoiY2VmZGM3NWYtZmE0NS00MDcxLTkxNzUtOTFiZmFjNGQ1Y2FkIiwiaWF0IjoxNzgyNDU2MTg3LCJleHAiOjE3ODI0NTcwODd9.CR2GRqWeIV9KMcYFIlJfSwV3x93YSRicQQFDHjExNA8R2md96tsouInbjp1SUuMc
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
