@@ -14,7 +14,7 @@ public class ProductService {
     private final ProductRepository productRepository;
 
     public ProductResponseDTO getAllProducts(Pageable pageable, String category, BigDecimal minPrice, BigDecimal maxPrice) {
-        Slice<ProductData> productSlice = productRepository.findProductSlices(pageable);
+        Slice<ProductData> productSlice = productRepository.findProductSlices(pageable, category, minPrice, maxPrice);
         int pageNumber = productSlice.getNumber();
         boolean hasNext = productSlice.hasNext();
         List<ProductData> productDataList = productSlice.getContent();
