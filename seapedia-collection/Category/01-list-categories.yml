@@ -8,7 +8,35 @@ http:
   url: "{{BASE_URL}}/{{CATEGORY_MODULE}}"
   auth:
     type: bearer
-    token: eyJhbGciOiJIUzM4NCJ9.eyJyb2xlIjoiTk9OX0FETUlOIiwidXNlcklkIjoiYzVhNGMwMTQtYmUzNi00MGZkLTg1YTEtN2JmOGMxY2M3ODlkIiwic3ViIjoiWXVsaWFfQXFpbGFAeWFob28uY29tIiwianRpIjoiY2VmZGM3NWYtZmE0NS00MDcxLTkxNzUtOTFiZmFjNGQ1Y2FkIiwiaWF0IjoxNzgyNDU2MTg3LCJleHAiOjE3ODI0NTcwODd9.CR2GRqWeIV9KMcYFIlJfSwV3x93YSRicQQFDHjExNA8R2md96tsouInbjp1SUuMc
+    token: "{{ACCESS_TOKEN}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 200 OK", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("success is true", function() {
+          expect(res.getBody().success).to.equal(true);
+        });
+
+        test("message is correct", function() {
+          expect(res.getBody().message).to.equal("Category retrieved");
+        });
+
+        test("data is an array", function() {
+          expect(res.getBody().data).to.be.an("array");
+        });
+
+        test("each category has id and name", function() {
+          const data = res.getBody().data;
+          if (data.length > 0) {
+            expect(data[0]).to.have.property("id");
+            expect(data[0]).to.have.property("name");
+          }
+        });
 
 settings:
   encodeUrl: true

@@ -1,0 +1,69 @@
+info:
+  name: 01-list-products-default
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{BASE_URL}}/{{PRODUCT_MODULE}}"
+  params:
+    - name: page
+      value: "0"
+      type: query
+    - name: size
+      value: "10"
+      type: query
+    - name: order
+      value: "NEWEST"
+      type: query
+  auth:
+    type: bearer
+    token: "{{ACCESS_TOKEN}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 200 OK", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("success is true", function() {
+          expect(res.getBody().success).to.equal(true);
+        });
+
+        test("message is correct", function() {
+          expect(res.getBody().message).to.equal("Product Retrieved");
+        });
+
+        test("data has pageNumber", function() {
+          expect(res.getBody().data).to.have.property("pageNumber");
+          expect(res.getBody().data.pageNumber).to.equal(0);
+        });
+
+        test("data has hasNext boolean", function() {
+          expect(res.getBody().data.hasNext).to.be.a("boolean");
+        });
+
+        test("data.productData is an array", function() {
+          expect(res.getBody().data.productData).to.be.an("array");
+        });
+
+        test("each product has required fields", function() {
+          const products = res.getBody().data.productData;
+          if (products.length > 0) {
+            const p = products[0];
+            expect(p).to.have.property("id");
+            expect(p).to.have.property("name");
+            expect(p).to.have.property("price");
+            expect(p).to.have.property("stock");
+            expect(p).to.have.property("imageUrl");
+            expect(p).to.have.property("storeName");
+          }
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

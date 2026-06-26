@@ -1,0 +1,40 @@
+info:
+  name: 02-invalid-order
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{BASE_URL}}/{{PRODUCT_MODULE}}"
+  params:
+    - name: page
+      value: "0"
+      type: query
+    - name: size
+      value: "10"
+      type: query
+    - name: order
+      value: "INVALID_ORDER"
+      type: query
+  auth:
+    type: bearer
+    token: "{{ACCESS_TOKEN}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 400 or 500 (IllegalArgumentException from OrderStrategy.valueOf)", function() {
+          const status = res.getStatus();
+          expect(status === 400 || status === 500).to.equal(true);
+        });
+
+        test("success is false", function() {
+          expect(res.getBody().success).to.equal(false);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

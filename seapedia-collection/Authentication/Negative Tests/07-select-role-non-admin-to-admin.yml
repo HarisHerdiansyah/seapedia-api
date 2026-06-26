@@ -5,14 +5,16 @@ info:
 
 http:
   method: POST
-  url: "{{BASE_URL}}/{{AUTH_MODULE}}/non-admin-role"
+  url: "{{BASE_URL}}/{{AUTH_MODULE}}/select-active-role"
   body:
     type: json
     data: |-
       {
         "activeRole": "ADMIN"
       }
-  auth: inherit
+  auth:
+    type: bearer
+    token: "{{ACCESS_TOKEN}}"
 
 runtime:
   scripts:

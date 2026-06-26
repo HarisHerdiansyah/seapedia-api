@@ -27,7 +27,7 @@ public class ProductController {
             @RequestParam(required = false) String category,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
-            @RequestParam(required = false) String order
+            @RequestParam(defaultValue = "NEWEST") String order
     ) {
         OrderStrategy orderStrategy = OrderStrategy.valueOf(order.toUpperCase());
         Sort sort = switch (orderStrategy) {
