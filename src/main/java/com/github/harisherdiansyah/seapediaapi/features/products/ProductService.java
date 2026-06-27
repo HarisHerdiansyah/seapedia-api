@@ -7,13 +7,14 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
 
-    public ProductResponseDTO getAllProducts(Pageable pageable, String category, BigDecimal minPrice, BigDecimal maxPrice) {
+    public ProductResponseDTO getAllProducts(Pageable pageable, UUID category, BigDecimal minPrice, BigDecimal maxPrice) {
         Slice<ProductData> productSlice = productRepository.findProductSlices(pageable, category, minPrice, maxPrice);
         int pageNumber = productSlice.getNumber();
         boolean hasNext = productSlice.hasNext();

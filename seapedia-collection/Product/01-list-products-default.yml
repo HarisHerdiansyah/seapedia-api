@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: "{{BASE_URL}}/{{PRODUCT_MODULE}}?page=0&size=20&order=NEWEST"
+  url: "{{BASE_URL}}/{{PRODUCT_MODULE}}?page=0&size=20&category=00c33905-246d-4b2e-9868-62a8d647c5a9"
   params:
     - name: page
       value: "0"
@@ -15,6 +15,10 @@ http:
       type: query
     - name: order
       value: NEWEST
+      type: query
+      disabled: true
+    - name: category
+      value: 00c33905-246d-4b2e-9868-62a8d647c5a9
       type: query
 
 runtime:

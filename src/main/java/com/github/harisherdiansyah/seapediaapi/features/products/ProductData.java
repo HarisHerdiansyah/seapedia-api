@@ -6,6 +6,7 @@ import java.util.UUID;
 
 public record ProductData(UUID id,
                           String name,
+                          String category,
                           BigDecimal price,
                           String imageUrl,
                           String location,

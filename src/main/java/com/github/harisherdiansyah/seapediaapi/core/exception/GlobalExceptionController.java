@@ -60,4 +60,11 @@ public class GlobalExceptionController {
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(ApiResponse.error(HttpStatus.UNAUTHORIZED.value(), "Invalid or expired token.", null));
     }
+
+    @ExceptionHandler(InternalServerErrorException.class)
+    public ResponseEntity<?> internalServerErrorException(InternalServerErrorException ex) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage(), null));
+    }
 }
