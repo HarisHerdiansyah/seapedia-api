@@ -5,26 +5,23 @@ info:
 
 http:
   method: GET
-  url: "{{BASE_URL}}/{{PRODUCT_MODULE}}"
+  url: "{{BASE_URL}}/{{PRODUCT_MODULE}}?page=0&size=20&order=PRICE_ASC&minPrice=10000&maxPrice=50000"
   params:
     - name: page
       value: "0"
       type: query
     - name: size
-      value: "10"
+      value: "20"
       type: query
     - name: order
-      value: "PRICE_ASC"
+      value: PRICE_ASC
       type: query
     - name: minPrice
       value: "10000"
       type: query
     - name: maxPrice
-      value: "500000"
+      value: "50000"
       type: query
-  auth:
-    type: bearer
-    token: "{{ACCESS_TOKEN}}"
 
 runtime:
   scripts:

@@ -3,12 +3,17 @@ package com.github.harisherdiansyah.seapediaapi.features.appreviews;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @RequiredArgsConstructor
 public class AppReviewService {
     private final AppReviewRepository appReviewRepository;
+
+    public List<AppReviewsResponseDTO> getAppReviews() {
+        return appReviewRepository.findAllProjectionsBy();
+    }
 
     public void submitAppReview(AppReviewRequestDTO appReviewRequestDTO) {
         boolean isAnon = appReviewRequestDTO.getReviewer() == null || appReviewRequestDTO.getReviewer().isEmpty();

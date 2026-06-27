@@ -5,20 +5,17 @@ info:
 
 http:
   method: GET
-  url: "{{BASE_URL}}/{{PRODUCT_MODULE}}"
+  url: "{{BASE_URL}}/{{PRODUCT_MODULE}}?page=0&size=20&order=NEWEST"
   params:
     - name: page
       value: "0"
       type: query
     - name: size
-      value: "10"
+      value: "20"
       type: query
     - name: order
-      value: "NEWEST"
+      value: NEWEST
       type: query
-  auth:
-    type: bearer
-    token: "{{ACCESS_TOKEN}}"
 
 runtime:
   scripts:

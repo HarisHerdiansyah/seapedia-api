@@ -1,12 +1,13 @@
 package com.github.harisherdiansyah.seapediaapi.features.products;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 public record ProductData(UUID id,
                           String name,
                           BigDecimal price,
-                          Integer stock,
                           String imageUrl,
-                          String storeName) {
+                          String location,
+                          OffsetDateTime updatedAt) {
 }
