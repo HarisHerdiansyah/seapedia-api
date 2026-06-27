@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -24,4 +25,9 @@ public interface ProductRepository extends JpaRepository<ProductEntity, UUID> {
             @Param("minPrice") BigDecimal minPrice,
             @Param("maxPrice") BigDecimal maxPrice
     );
+
+    @Query("SELECT new com.github.harisherdiansyah.seapediaapi.features.products.ProductDetailData(p.id, p.name, c.name, p.price, p.stock, p.description, p.imageUrl, s.location, s.storeName) " +
+            "FROM ProductEntity p JOIN p.store s JOIN p.category c " +
+            "WHERE p.id = :id")
+    Optional<ProductDetailData> findProductDetailById(@Param("id") UUID id);
 }

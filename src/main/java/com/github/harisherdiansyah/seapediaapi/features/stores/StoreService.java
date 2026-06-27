@@ -1,5 +1,6 @@
 package com.github.harisherdiansyah.seapediaapi.features.stores;
 
+import com.github.harisherdiansyah.seapediaapi.core.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,5 +13,10 @@ public class StoreService {
 
     public boolean isStoreExistByUserId(UUID userId) {
         return storeRepository.existsByUserId(userId);
+    }
+
+    public StoreEntity getStoreByUserId(UUID userId) {
+        return storeRepository.findByUserId(userId)
+                .orElseThrow(() -> new NotFoundException("Store not found for user ID: " + userId));
     }
 }

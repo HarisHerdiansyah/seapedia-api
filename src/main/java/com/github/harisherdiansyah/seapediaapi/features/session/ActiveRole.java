@@ -9,9 +9,9 @@ import java.util.stream.Collectors;
 
 public enum ActiveRole {
     ADMIN(Set.of("MANAGE_APP", "MANAGE_PROFILE")),
-    NON_ADMIN(Set.of("MANAGE_PROFILE", "SELECT_ROLE")),
+    NON_ADMIN(Set.of("MANAGE_PROFILE", "SELECT_ROLE", "REGISTER_STORE", "REGISTER_DRIVER")),
     BUYER(Set.of("MANAGE_PROFILE", "SELECT_ROLE")),
-    SELLER(Set.of("MANAGE_PROFILE", "SELECT_ROLE")),
+    SELLER(Set.of("MANAGE_PROFILE", "SELECT_ROLE", "MANAGE_PRODUCT")),
     DRIVER(Set.of("MANAGE_PROFILE", "SELECT_ROLE"));
 
     private final Set<String> permissions;

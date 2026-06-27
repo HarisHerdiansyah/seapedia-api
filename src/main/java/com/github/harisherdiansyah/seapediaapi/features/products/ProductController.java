@@ -7,10 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -42,5 +40,45 @@ public class ProductController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApiResponse.success(HttpStatus.OK.value(), "Product Retrieved", response));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getProductById(@PathVariable UUID id) {
+        ProductDetailData response = productService.getProductById(id);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponse.success(HttpStatus.OK.value(), "Detail Retrieved", response));
+    }
+
+    @PreAuthorize("hasRole('SELLER') and hasAuthority('MANAGE_PRODUCT')")
+    @PostMapping("")
+    public ResponseEntity<?> createProduct(
+            @RequestBody ProductRequestDTO productRequestDTO,
+            @CookieValue(name = "refreshToken", defaultValue = "") String rt
+    ) {
+        productService.createProduct(productRequestDTO, rt);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponse.success(HttpStatus.CREATED.value(), "Product created", null));
+    }
+
+    @PreAuthorize("hasRole('SELLER') and hasAuthority('MANAGE_PRODUCT')")
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateProduct(
+            @PathVariable UUID id,
+            @RequestBody ProductRequestDTO productRequestDTO) {
+        productService.updateProduct(id, productRequestDTO);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponse.success(HttpStatus.CREATED.value(), "Product updated", null));
+    }
+
+    @PreAuthorize("hasRole('SELLER') and hasAuthority('MANAGE_PRODUCT')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteProduct(@PathVariable UUID id) {
+        productService.deleteProduct(id);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponse.success(HttpStatus.OK.value(), "Product deleted", null));
     }
 }
