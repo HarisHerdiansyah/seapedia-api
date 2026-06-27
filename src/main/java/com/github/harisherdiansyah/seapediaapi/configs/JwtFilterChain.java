@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -25,6 +26,8 @@ import java.util.List;
 public class JwtFilterChain extends OncePerRequestFilter {
     private final JwtUtility jwtUtility;
 
+    private final AntPathMatcher antPathMatcher = new AntPathMatcher();
+
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
@@ -32,13 +35,19 @@ public class JwtFilterChain extends OncePerRequestFilter {
 
         if (HttpMethod.GET.matches(method)) {
             for (String endpoint : SecurityConstant.PUBLIC_GET_ENDPOINTS) {
-                if (path.matches(endpoint.replace("**", ".*"))) {
+                if (antPathMatcher.match(endpoint, path) || antPathMatcher.match(endpoint.replace("/**", ""), path)) {
                     return true;
                 }
             }
         } else if (HttpMethod.POST.matches(method)) {
             for (String endpoint : SecurityConstant.PUBLIC_POST_ENDPOINTS) {
-                if (path.matches(endpoint.replace("**", ".*"))) {
+                if (antPathMatcher.match(endpoint, path) || antPathMatcher.match(endpoint.replace("/**", ""), path)) {
+                    return true;
+                }
+            }
+        } else if (HttpMethod.PATCH.matches(method)) {
+            for (String endpoint : SecurityConstant.PUBLIC_PATCH_ENDPOINTS) {
+                if (antPathMatcher.match(endpoint, path) || antPathMatcher.match(endpoint.replace("/**", ""), path)) {
                     return true;
                 }
             }

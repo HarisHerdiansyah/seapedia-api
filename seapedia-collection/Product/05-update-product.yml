@@ -1,0 +1,48 @@
+info:
+  name: 05-update-product
+  type: http
+  seq: 5
+
+http:
+  method: PUT
+  url: "{{BASE_URL}}/{{PRODUCT_MODULE}}/{{PRODUCT_ID}}"
+  body:
+    type: json
+    data: |-
+      {
+        "categoryId": "YOUR_CATEGORY_ID_HERE",
+        "name": "Ikan Segar Berkualitas Update",
+        "price": 55000.0,
+        "stock": 150,
+        "description": "Ikan segar ditangkap langsung dari laut lepas dengan kualitas terjamin dan bergizi sangat baik."
+      }
+  auth:
+    type: bearer
+    token: "{{ACCESS_TOKEN}}"
+
+vars:
+  pre-request:
+    - name: PRODUCT_ID
+      value: "YOUR_PRODUCT_ID_HERE"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 201 Created", function() {
+          expect(res.getStatus()).to.equal(201);
+        });
+
+        test("success is true", function() {
+          expect(res.getBody().success).to.equal(true);
+        });
+
+        test("message is Product updated", function() {
+          expect(res.getBody().message).to.equal("Product updated");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,6 +1,7 @@
 package com.github.harisherdiansyah.seapediaapi.features.products;
 
 import com.github.harisherdiansyah.seapediaapi.core.utils.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -53,7 +54,7 @@ public class ProductController {
     @PreAuthorize("hasRole('SELLER') and hasAuthority('MANAGE_PRODUCT')")
     @PostMapping("")
     public ResponseEntity<?> createProduct(
-            @RequestBody ProductRequestDTO productRequestDTO,
+            @Valid @RequestBody ProductRequestDTO productRequestDTO,
             @CookieValue(name = "refreshToken", defaultValue = "") String rt
     ) {
         productService.createProduct(productRequestDTO, rt);
@@ -66,7 +67,7 @@ public class ProductController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProduct(
             @PathVariable UUID id,
-            @RequestBody ProductRequestDTO productRequestDTO) {
+            @Valid @RequestBody ProductRequestDTO productRequestDTO) {
         productService.updateProduct(id, productRequestDTO);
         return ResponseEntity
                 .status(HttpStatus.CREATED)

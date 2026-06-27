@@ -7,5 +7,5 @@ import java.util.UUID;
 
 @Repository
 public interface DriverRepository extends JpaRepository<DriverEntity, UUID> {
-    boolean existsByUserId(UUID userId);
+    boolean existsByUser_Id(UUID userId);
 }

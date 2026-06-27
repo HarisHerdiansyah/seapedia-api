@@ -3,10 +3,10 @@ package com.github.harisherdiansyah.seapediaapi.core.utils;
 public class SecurityConstant {
 
     public static String[] PUBLIC_GET_ENDPOINTS = {
-        "/api/health-check",
-        "/api/categories",
-        "/api/products",
-        "/api/app-review",
+        "/api/health-check/**",
+        "/api/categories/**",
+        "/api/products/**",
+        "/api/app-review/**",
     };
     public static String[] PUBLIC_POST_ENDPOINTS = {
         "/api/authentication/login",

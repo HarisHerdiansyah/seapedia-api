@@ -6,9 +6,7 @@ info:
 http:
   method: POST
   url: "{{BASE_URL}}/{{AUTH_MODULE}}/refresh-token"
-  auth:
-    type: bearer
-    token: "{{ACCESS_TOKEN}}"
+  auth: inherit
 
 runtime:
   scripts:

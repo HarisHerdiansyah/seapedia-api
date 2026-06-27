@@ -7,6 +7,8 @@ import com.github.harisherdiansyah.seapediaapi.features.authentication.ResetPass
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -23,6 +25,11 @@ public class UserService {
     public UserEntity getUserByEmail(String email) {
         return userRepository.findUserEntityByEmail(email)
                 .orElseThrow(() -> new NotFoundException("User with email " + email + " is never exist."));
+    }
+
+    public UserEntity getUserById(UUID id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User with id " + id + " is never exist."));
     }
 
     public RegisterResponseDTO createUser(RegisterRequestDTO requestDTO) {

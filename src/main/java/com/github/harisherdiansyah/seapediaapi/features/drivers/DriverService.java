@@ -11,6 +11,6 @@ public class DriverService {
     private final DriverRepository driverRepository;
 
     public boolean isDriverExistByUserId(UUID userId) {
-        return driverRepository.existsByUserId(userId);
+        return driverRepository.existsByUser_Id(userId);
     }
 }

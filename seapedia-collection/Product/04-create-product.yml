@@ -1,0 +1,43 @@
+info:
+  name: 04-create-product
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/{{PRODUCT_MODULE}}"
+  body:
+    type: json
+    data: |-
+      {
+        "categoryId": "YOUR_CATEGORY_ID_HERE",
+        "name": "Ikan Segar Berkualitas",
+        "price": 50000.0,
+        "stock": 100,
+        "description": "Ikan segar ditangkap langsung dari laut lepas dengan kualitas terjamin dan bergizi."
+      }
+  auth:
+    type: bearer
+    token: "{{ACCESS_TOKEN}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 201 Created", function() {
+          expect(res.getStatus()).to.equal(201);
+        });
+
+        test("success is true", function() {
+          expect(res.getBody().success).to.equal(true);
+        });
+
+        test("message is Product created", function() {
+          expect(res.getBody().message).to.equal("Product created");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

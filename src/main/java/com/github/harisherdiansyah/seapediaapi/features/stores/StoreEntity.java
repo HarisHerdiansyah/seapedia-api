@@ -1,5 +1,6 @@
 package com.github.harisherdiansyah.seapediaapi.features.stores;
 
+import com.github.harisherdiansyah.seapediaapi.features.users.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,8 +24,9 @@ public class StoreEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "user_id", nullable = false, unique = true)
-    private UUID userId;
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private UserEntity user;
 
     @Column(name = "store_name", nullable = false, unique = true, length = 100)
     private String storeName;

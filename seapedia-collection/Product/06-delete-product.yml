@@ -1,20 +1,22 @@
 info:
-  name: 08-logout
+  name: 06-delete-product
   type: http
-  seq: 8
+  seq: 6
 
 http:
-  method: POST
-  url: "{{BASE_URL}}/{{AUTH_MODULE}}/logout"
-  auth: inherit
+  method: DELETE
+  url: "{{BASE_URL}}/{{PRODUCT_MODULE}}/{{PRODUCT_ID}}"
+  auth:
+    type: bearer
+    token: "{{ACCESS_TOKEN}}"
+
+vars:
+  pre-request:
+    - name: PRODUCT_ID
+      value: "YOUR_PRODUCT_ID_HERE"
 
 runtime:
   scripts:
-    - type: post-response
-      code: |-
-        if (res.getStatus() === 200) {
-          bru.setEnvVar("ACCESS_TOKEN", "");
-        }
     - type: tests
       code: |-
         test("Status is 200 OK", function() {
@@ -25,8 +27,8 @@ runtime:
           expect(res.getBody().success).to.equal(true);
         });
 
-        test("message is correct", function() {
-          expect(res.getBody().message).to.equal("Logout successful.");
+        test("message is Product deleted", function() {
+          expect(res.getBody().message).to.equal("Product deleted");
         });
 
 settings:
