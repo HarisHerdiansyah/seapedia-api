@@ -10,13 +10,16 @@ http:
     type: json
     data: |-
       {
-        "activeRole": "BUYER"
+        "activeRole": "SELLER"
       }
   auth:
     type: bearer
     token: "{{ACCESS_TOKEN}}"
 
 runtime:
+  variables:
+    - name: ACCESS_TOKEN
+      value: eyJhbGciOiJIUzM4NCJ9.eyJyb2xlIjoiTk9OX0FETUlOIiwidXNlcklkIjoiZjlmNGVjNjEtNGIyMy00ZTQ2LTkzM2UtMDFjMzRiZDM2MmE3Iiwic3ViIjoiUnVzbWFuNzBAeWFob28uY29tIiwianRpIjoiNzBmOWJhZmItYzc4OS00Y2JjLWFhNzYtYTZjOGIxZGJmZjBlIiwiaWF0IjoxNzgyNjA4NTEwLCJleHAiOjE3ODI2MDk0MTB9.IxksJaFzYVhxKis0A9s37rPd0VlK20dP_ZXtKqAsJynEHMoxqONNTX3w0iS8vfZX
   scripts:
     - type: tests
       code: |-

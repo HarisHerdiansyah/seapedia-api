@@ -57,10 +57,10 @@ public class ProductController {
             @Valid @RequestBody ProductRequestDTO productRequestDTO,
             @CookieValue(name = "refreshToken", defaultValue = "") String rt
     ) {
-        productService.createProduct(productRequestDTO, rt);
+        ProductDetailData product = productService.createProduct(productRequestDTO, rt);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiResponse.success(HttpStatus.CREATED.value(), "Product created", null));
+                .body(ApiResponse.success(HttpStatus.CREATED.value(), "Product created", product));
     }
 
     @PreAuthorize("hasRole('SELLER') and hasAuthority('MANAGE_PRODUCT')")
@@ -68,10 +68,10 @@ public class ProductController {
     public ResponseEntity<?> updateProduct(
             @PathVariable UUID id,
             @Valid @RequestBody ProductRequestDTO productRequestDTO) {
-        productService.updateProduct(id, productRequestDTO);
+        ProductDetailData product = productService.updateProduct(id, productRequestDTO);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiResponse.success(HttpStatus.CREATED.value(), "Product updated", null));
+                .body(ApiResponse.success(HttpStatus.CREATED.value(), "Product updated", product));
     }
 
     @PreAuthorize("hasRole('SELLER') and hasAuthority('MANAGE_PRODUCT')")

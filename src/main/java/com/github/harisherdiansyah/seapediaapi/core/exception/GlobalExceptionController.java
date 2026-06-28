@@ -67,4 +67,11 @@ public class GlobalExceptionController {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage(), null));
     }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<?> badRequestException(BadRequestException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), null));
+    }
 }

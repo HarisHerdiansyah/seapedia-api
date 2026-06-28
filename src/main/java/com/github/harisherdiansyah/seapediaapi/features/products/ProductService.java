@@ -37,12 +37,21 @@ public class ProductService {
         return new ProductResponseDTO(pageNumber, hasNext, productDataList);
     }
 
+    public ProductResponseDTO getStoreProductsByUserId(UUID userId, Pageable pageable, UUID category, BigDecimal minPrice, BigDecimal maxPrice) {
+        Slice<ProductData> productSlice = productRepository.findProductSlicesByStoreUserId(pageable, userId, category, minPrice, maxPrice);
+        int pageNumber = productSlice.getNumber();
+        boolean hasNext = productSlice.hasNext();
+        List<ProductData> productDataList = productSlice.getContent();
+
+        return new ProductResponseDTO(pageNumber, hasNext, productDataList);
+    }
+
     public ProductDetailData getProductById(UUID productId) {
         return productRepository.findProductDetailById(productId)
                 .orElseThrow(() -> new NotFoundException("Product not found for ID: " + productId));
     }
 
-    public void createProduct(ProductRequestDTO productRequestDTO, String rt) {
+    public ProductDetailData createProduct(ProductRequestDTO productRequestDTO, String rt) {
         if (!StringUtils.hasText(rt)) {
             throw new ForbiddenException("Refresh token is missing.");
         }
@@ -68,9 +77,21 @@ public class ProductService {
                 .build();
 
         productRepository.save(productEntity);
+
+        return new ProductDetailData(
+                productEntity.getId(),
+                productEntity.getName(),
+                productEntity.getCategory().getName(),
+                productEntity.getPrice(),
+                productEntity.getStock(),
+                productEntity.getDescription(),
+                productEntity.getImageUrl(),
+                storeEntity.getLocation(),
+                storeEntity.getStoreName()
+        );
     }
 
-    public void updateProduct(UUID productId, ProductRequestDTO productRequestDTO) {
+    public ProductDetailData updateProduct(UUID productId, ProductRequestDTO productRequestDTO) {
         ProductEntity productEntity = productRepository.findById(productId)
                 .orElseThrow(() -> new ForbiddenException("Product not found for ID: " + productId));
         CategoryEntity categoryEntity = categoryService.getCategoryById(productRequestDTO.getCategoryId());
@@ -82,6 +103,18 @@ public class ProductService {
         productEntity.setCategory(categoryEntity);
 
         productRepository.save(productEntity);
+
+        return new ProductDetailData(
+                productEntity.getId(),
+                productEntity.getName(),
+                productEntity.getCategory().getName(),
+                productEntity.getPrice(),
+                productEntity.getStock(),
+                productEntity.getDescription(),
+                productEntity.getImageUrl(),
+                productEntity.getStore().getLocation(),
+                productEntity.getStore().getStoreName()
+        );
     }
 
     public void deleteProduct(UUID productId) {

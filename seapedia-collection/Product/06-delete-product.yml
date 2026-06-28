@@ -10,12 +10,12 @@ http:
     type: bearer
     token: "{{ACCESS_TOKEN}}"
 
-vars:
-  pre-request:
-    - name: PRODUCT_ID
-      value: "YOUR_PRODUCT_ID_HERE"
-
 runtime:
+  variables:
+    - name: PRODUCT_ID
+      value: 91b69b9a-43be-40cf-bf14-971b9c228739
+    - name: ACCESS_TOKEN
+      value: eyJhbGciOiJIUzM4NCJ9.eyJyb2xlIjoiU0VMTEVSIiwidXNlcklkIjoiZjlmNGVjNjEtNGIyMy00ZTQ2LTkzM2UtMDFjMzRiZDM2MmE3Iiwic3ViIjoiUnVzbWFuNzBAeWFob28uY29tIiwianRpIjoiNzBmOWJhZmItYzc4OS00Y2JjLWFhNzYtYTZjOGIxZGJmZjBlIiwiaWF0IjoxNzgyNjA4NTYxLCJleHAiOjE3ODI2MDk0NjF9.ESB2nD1RBydbYQKXba_Hwxh6UMId73P_XBrpmAk45mrEfy94sCXXG9dzanXWrond
   scripts:
     - type: tests
       code: |-

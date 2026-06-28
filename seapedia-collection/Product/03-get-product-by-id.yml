@@ -8,12 +8,10 @@ http:
   url: "{{BASE_URL}}/{{PRODUCT_MODULE}}/{{PRODUCT_ID}}"
   auth: inherit
 
-vars:
-  pre-request:
-    - name: PRODUCT_ID
-      value: "YOUR_PRODUCT_ID_HERE"
-
 runtime:
+  variables:
+    - name: PRODUCT_ID
+      value: 91b69b9a-43be-40cf-bf14-971b9c228739
   scripts:
     - type: tests
       code: |-

@@ -1,0 +1,41 @@
+info:
+  name: 01-register-store
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/stores"
+  body:
+    type: json
+    data: |-
+      {
+        "userId": "YOUR_USER_ID_HERE",
+        "storeName": "Toko Ikan Segar",
+        "location": "Jakarta Utara"
+      }
+  auth:
+    type: bearer
+    token: "{{ACCESS_TOKEN}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status is 201 Created", function() {
+          expect(res.getStatus()).to.equal(201);
+        });
+
+        test("success is true", function() {
+          expect(res.getBody().success).to.equal(true);
+        });
+
+        test("message is Store registered.", function() {
+          expect(res.getBody().message).to.equal("Store registered.");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

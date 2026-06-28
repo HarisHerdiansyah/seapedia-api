@@ -5,11 +5,8 @@ info:
 
 http:
   method: GET
-  url: "{{BASE_URL}}/{{PRODUCT_MODULE}}?category=00c33905-246d-4b2e-9868-62a8d647c5a9&minPrice=0&maxPrice=1000000&page=0&size=20"
+  url: "{{BASE_URL}}/{{PRODUCT_MODULE}}?minPrice=0&maxPrice=1000000&page=0&size=20"
   params:
-    - name: category
-      value: 00c33905-246d-4b2e-9868-62a8d647c5a9
-      type: query
     - name: minPrice
       value: "0"
       type: query
