@@ -28,22 +28,13 @@ public class ProductService {
     private final StoreService storeService;
     private final CategoryService categoryService;
 
-    public ProductResponseDTO getAllProducts(Pageable pageable, UUID category, BigDecimal minPrice, BigDecimal maxPrice) {
+    public ProductResponseDTO<ProductData> getAllProducts(Pageable pageable, UUID category, BigDecimal minPrice, BigDecimal maxPrice) {
         Slice<ProductData> productSlice = productRepository.findProductSlices(pageable, category, minPrice, maxPrice);
         int pageNumber = productSlice.getNumber();
         boolean hasNext = productSlice.hasNext();
         List<ProductData> productDataList = productSlice.getContent();
 
-        return new ProductResponseDTO(pageNumber, hasNext, productDataList);
-    }
-
-    public ProductResponseDTO getStoreProductsByUserId(UUID userId, Pageable pageable, UUID category, BigDecimal minPrice, BigDecimal maxPrice) {
-        Slice<ProductData> productSlice = productRepository.findProductSlicesByStoreUserId(pageable, userId, category, minPrice, maxPrice);
-        int pageNumber = productSlice.getNumber();
-        boolean hasNext = productSlice.hasNext();
-        List<ProductData> productDataList = productSlice.getContent();
-
-        return new ProductResponseDTO(pageNumber, hasNext, productDataList);
+        return new ProductResponseDTO<>(pageNumber, hasNext, productDataList);
     }
 
     public ProductDetailData getProductById(UUID productId) {

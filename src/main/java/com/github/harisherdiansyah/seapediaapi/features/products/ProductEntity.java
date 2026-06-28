@@ -3,6 +3,8 @@ package com.github.harisherdiansyah.seapediaapi.features.products;
 import com.github.harisherdiansyah.seapediaapi.features.categories.CategoryEntity;
 import com.github.harisherdiansyah.seapediaapi.features.stores.StoreEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -44,6 +46,12 @@ public class ProductEntity {
     @Column(nullable = false)
     @Builder.Default
     private Integer stock = 0;
+
+    @Column(nullable = false, precision = 2, scale = 1)
+    @DecimalMin("0.0")
+    @DecimalMax("5.0")
+    @Builder.Default
+    private BigDecimal rating = BigDecimal.ZERO;
 
     @Column(name = "image_url", columnDefinition = "text")
     private String imageUrl;

@@ -57,7 +57,7 @@ public class StoreController {
             case OrderStrategy.PRICE_DESC -> Sort.by(Sort.Direction.DESC, "price");
         };
         Pageable pageable = PageRequest.of(page, size, sort);
-        ProductResponseDTO response = storeService.getStoreProducts(SecurityUtil.getCurrentUserId(), pageable, category, minPrice, maxPrice);
+        ProductResponseDTO<StoreProductData> response = storeService.getAllStoreProducts(pageable, category, minPrice, maxPrice);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApiResponse.success(HttpStatus.OK.value(), "Product Retrieved", response));

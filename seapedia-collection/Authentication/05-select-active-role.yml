@@ -19,7 +19,7 @@ http:
 runtime:
   variables:
     - name: ACCESS_TOKEN
-      value: eyJhbGciOiJIUzM4NCJ9.eyJyb2xlIjoiTk9OX0FETUlOIiwidXNlcklkIjoiZjlmNGVjNjEtNGIyMy00ZTQ2LTkzM2UtMDFjMzRiZDM2MmE3Iiwic3ViIjoiUnVzbWFuNzBAeWFob28uY29tIiwianRpIjoiNzBmOWJhZmItYzc4OS00Y2JjLWFhNzYtYTZjOGIxZGJmZjBlIiwiaWF0IjoxNzgyNjA4NTEwLCJleHAiOjE3ODI2MDk0MTB9.IxksJaFzYVhxKis0A9s37rPd0VlK20dP_ZXtKqAsJynEHMoxqONNTX3w0iS8vfZX
+      value: eyJhbGciOiJIUzM4NCJ9.eyJyb2xlIjoiTk9OX0FETUlOIiwidXNlcklkIjoiNmExNjZhMTYtZTI4ZC00N2VhLThkOWMtNzhlZTQ0Yzk2ZmIzIiwic3ViIjoic3ByaW5nMDFAZ21haWwuY29tIiwianRpIjoiYzgyNmE3NWItNzczYi00OTQ5LTk0NzQtMTljZmJhZjBhZWU3IiwiaWF0IjoxNzgyNjQwMjUwLCJleHAiOjE3ODI2NDExNTB9.iMYedn16XmGbUO-JeEkbuFA1YNVV51RVr-K0W8EPaqoWbRxUm9aLz8Qzl5_pf8XT
   scripts:
     - type: tests
       code: |-

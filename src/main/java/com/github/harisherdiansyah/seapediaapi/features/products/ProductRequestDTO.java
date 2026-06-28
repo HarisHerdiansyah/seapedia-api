@@ -30,4 +30,6 @@ public class ProductRequestDTO {
     @NotBlank(message = "Description cannot be empty.")
     @Size(min = 30, message = "Description must be at least 30 characters.")
     private String description;
+
+    private String imageUrl;
 }

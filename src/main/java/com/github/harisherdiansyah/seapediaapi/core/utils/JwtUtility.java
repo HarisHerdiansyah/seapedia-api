@@ -95,16 +95,18 @@ public class JwtUtility {
         UserPrincipalEntity userPrincipal = UserPrincipalEntity.builder()
                 .userId(extractUserId(token))
                 .username(extractSubject(token))
+                .userRole(extractRoles(token))
                 .password("")
                 .authorities(authorities)
                 .build();
         return new UsernamePasswordAuthenticationToken(userPrincipal, null, authorities);
     }
 
-    public Authentication buildAuthToken(UUID userId, String tokenSubject, List<GrantedAuthority> authorities) {
+    public Authentication buildAuthToken(UUID userId, String tokenSubject, String userRole, List<GrantedAuthority> authorities) {
         UserPrincipalEntity userPrincipal = UserPrincipalEntity.builder()
                 .userId(userId)
                 .username(tokenSubject)
+                .userRole(userRole)
                 .password("")
                 .authorities(authorities)
                 .build();

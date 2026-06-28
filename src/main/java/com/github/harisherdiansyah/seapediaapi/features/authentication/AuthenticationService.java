@@ -10,6 +10,7 @@ import com.github.harisherdiansyah.seapediaapi.features.session.CreateSessionDTO
 import com.github.harisherdiansyah.seapediaapi.features.session.SessionService;
 import com.github.harisherdiansyah.seapediaapi.features.session.UserSessionInfo;
 import com.github.harisherdiansyah.seapediaapi.features.stores.StoreService;
+import com.github.harisherdiansyah.seapediaapi.features.users.UserEntity;
 import com.github.harisherdiansyah.seapediaapi.features.users.UserRole;
 import com.github.harisherdiansyah.seapediaapi.features.users.UserService;
 import lombok.RequiredArgsConstructor;
@@ -95,11 +96,12 @@ public class AuthenticationService {
         UUID userId = userSessionInfo.getId();
         String activeRoleStr = String.valueOf(userSessionInfo.getActiveRole());
         String email = userSessionInfo.getEmail();
+        String role = String.valueOf(userSessionInfo.getRole());
 
         ActiveRole activeRole = ActiveRole.valueOf(activeRoleStr);
         List<GrantedAuthority> authorities = activeRole.getAuthorities();
 
-        Authentication authToken = jwtUtility.buildAuthToken(userId, email, authorities);
+        Authentication authToken = jwtUtility.buildAuthToken(userId, email, role, authorities);
         UserPrincipalEntity principal = (UserPrincipalEntity) authToken.getPrincipal();
         return buildSessionAndTokens(principal, ipAddress, deviceInfo);
     }
@@ -128,14 +130,12 @@ public class AuthenticationService {
 
     private Map<String, Object> buildAuthResponse(UserPrincipalEntity principal, String at, String rt) {
         List<ActiveRole> allowedAs = new ArrayList<>();
-        boolean isNonAdmin = UserRole.NON_ADMIN.toString().equals(principal.getUserRole()); // well-known as public user
+
         boolean isSeller = storeService.isStoreExistByUserId(principal.getUserId());
         boolean isDriver = driverService.isDriverExistByUserId(principal.getUserId());
-        if (isNonAdmin) {
-            if (isSeller) allowedAs.add(ActiveRole.SELLER);
-            if (isDriver) allowedAs.add(ActiveRole.DRIVER);
-            allowedAs.add(ActiveRole.BUYER);
-        }
+        if (isSeller) allowedAs.add(ActiveRole.SELLER);
+        if (isDriver) allowedAs.add(ActiveRole.DRIVER);
+        allowedAs.add(ActiveRole.BUYER);
 
         String cookieResponse = jwtUtility.buildRefreshTokenCookie(rt).toString();
         LoginResponseDTO.UserObject userObject = new LoginResponseDTO.UserObject(
