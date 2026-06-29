@@ -11,6 +11,10 @@ public class SecurityConstant {
         "/api/stores/*/profile",
         "/api/stores/*/catalog",
         "/api/stores/products/*",
+        "/swagger-ui/**",
+        "/v3/api-docs/**",
+        "/swagger-resources/**",
+        "/webjars/**",
     };
     public static String[] PUBLIC_POST_ENDPOINTS = {
         "/api/authentication/login",

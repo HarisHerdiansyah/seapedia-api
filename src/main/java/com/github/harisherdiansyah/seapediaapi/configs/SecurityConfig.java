@@ -46,7 +46,8 @@ public class SecurityConfig {
                 "http://localhost:3000",
                 "http://localhost:8080",
                 "https://hoppscotch.io",
-                "app://bruno"
+                "app://bruno",
+                "https://seapedia-ui.vercel.app"
         ));
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
