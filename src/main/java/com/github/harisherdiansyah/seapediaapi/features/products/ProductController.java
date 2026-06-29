@@ -36,7 +36,13 @@ public class ProductController {
             @Parameter(description = "Maximum price filter") @RequestParam(required = false) BigDecimal maxPrice,
             @Parameter(description = "Sorting strategy (NEWEST, OLDEST, PRICE_ASC, PRICE_DESC)") @RequestParam(defaultValue = "NEWEST") String order
     ) {
-        OrderStrategy orderStrategy = OrderStrategy.valueOf(order.toUpperCase());
+        OrderStrategy orderStrategy;
+        try {
+            orderStrategy = OrderStrategy.valueOf(order.toUpperCase());
+        } catch (IllegalArgumentException | NullPointerException e) {
+            orderStrategy = OrderStrategy.NEWEST;
+        }
+
         Sort sort = switch (orderStrategy) {
             case OrderStrategy.NEWEST -> Sort.by(Sort.Direction.DESC, "createdAt");
             case OrderStrategy.OLDEST -> Sort.by(Sort.Direction.ASC, "createdAt");
