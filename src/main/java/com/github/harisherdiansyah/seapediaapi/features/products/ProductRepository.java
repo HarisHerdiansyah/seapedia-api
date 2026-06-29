@@ -17,7 +17,7 @@ import com.github.harisherdiansyah.seapediaapi.features.stores.StoreProductDetai
 @Repository
 public interface ProductRepository extends JpaRepository<ProductEntity, UUID> {
 
-    @Query("SELECT new com.github.harisherdiansyah.seapediaapi.features.products.ProductData(p.id, p.name, c.name, p.price, p.imageUrl, s.location, p.updatedAt) " +
+    @Query("SELECT new com.github.harisherdiansyah.seapediaapi.features.products.ProductData(p.id, p.name, c.name, p.price, p.rating, p.imageUrl, s.location, p.updatedAt) " +
             "FROM ProductEntity p JOIN p.store s JOIN p.category c " +
             "WHERE (:category IS NULL OR c.id = :category) AND " +
             "(:minPrice IS NULL OR p.price >= :minPrice) AND " +
@@ -29,7 +29,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, UUID> {
             @Param("maxPrice") BigDecimal maxPrice
     );
 
-    @Query("SELECT new com.github.harisherdiansyah.seapediaapi.features.products.ProductDetailData(p.id, p.name, c.name, p.price, p.stock, p.description, p.imageUrl, s.location, s.storeName) " +
+    @Query("SELECT new com.github.harisherdiansyah.seapediaapi.features.products.ProductDetailData(p.id, p.name, c.id, c.name, p.price, p.stock, p.description, p.rating, p.imageUrl, s.location, s.id, s.storeName) " +
             "FROM ProductEntity p JOIN p.store s JOIN p.category c " +
             "WHERE p.id = :id")
     Optional<ProductDetailData> findProductDetailById(@Param("id") UUID id);

@@ -7,6 +7,10 @@ public class SecurityConstant {
         "/api/categories/**",
         "/api/products/**",
         "/api/app-review/**",
+        "/api/stores/*/categories",
+        "/api/stores/*/profile",
+        "/api/stores/*/catalog",
+        "/api/stores/products/*",
     };
     public static String[] PUBLIC_POST_ENDPOINTS = {
         "/api/authentication/login",

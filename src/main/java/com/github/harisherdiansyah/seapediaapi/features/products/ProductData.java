@@ -8,6 +8,7 @@ public record ProductData(UUID id,
                           String name,
                           String category,
                           BigDecimal price,
+                          BigDecimal rating,
                           String imageUrl,
                           String location,
                           OffsetDateTime updatedAt) {

@@ -4,6 +4,7 @@ import com.github.harisherdiansyah.seapediaapi.core.exception.BadRequestExceptio
 import com.github.harisherdiansyah.seapediaapi.core.exception.DuplicateDataException;
 import com.github.harisherdiansyah.seapediaapi.core.exception.NotFoundException;
 import com.github.harisherdiansyah.seapediaapi.core.utils.SecurityUtil;
+import com.github.harisherdiansyah.seapediaapi.features.categories.CategoryResponseDTO;
 import com.github.harisherdiansyah.seapediaapi.features.products.ProductData;
 import com.github.harisherdiansyah.seapediaapi.features.products.ProductResponseDTO;
 import com.github.harisherdiansyah.seapediaapi.features.products.ProductService;
@@ -61,6 +62,35 @@ public class StoreService {
         int pageNumber = productSlice.getNumber();
         boolean hasNext = productSlice.hasNext();
         List<StoreProductData> storeProductDataList = productSlice.getContent();
+
+        return new ProductResponseDTO<>(pageNumber, hasNext, storeProductDataList);
+    }
+
+    public StoreProductDetailData getStoreProductById(UUID productId) {
+        return storeRepository.findStoreProductDetailById(productId)
+                .orElseThrow(() -> new NotFoundException("Product not found for ID: " + productId));
+    }
+
+    public List<CategoryResponseDTO> getAllCategoriesByStoreId(UUID storeId) {
+        return storeRepository.findAllCategoriesByStoreId(storeId);
+    }
+
+    public StoreProfileResponseDTO getStoreProfileById(UUID storeId) {
+        StoreEntity storeEntity = storeRepository.findById(storeId)
+                .orElseThrow(() -> new NotFoundException("Store not found for ID: " + storeId));
+        return new StoreProfileResponseDTO(
+                storeEntity.getId(),
+                storeEntity.getStoreName(),
+                storeEntity.getUser().getEmail(),
+                storeEntity.getLocation()
+        );
+    }
+
+    public ProductResponseDTO<ProductData> getAllStoreProductsByStoreId(UUID storeId, Pageable pageable, UUID category) {
+        Slice<ProductData> productSlice = storeRepository.findCatalogSlicesByStoreId(pageable, storeId, category);
+        int pageNumber = productSlice.getNumber();
+        boolean hasNext = productSlice.hasNext();
+        List<ProductData> storeProductDataList = productSlice.getContent();
 
         return new ProductResponseDTO<>(pageNumber, hasNext, storeProductDataList);
     }

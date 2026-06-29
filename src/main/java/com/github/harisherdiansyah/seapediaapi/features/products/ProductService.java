@@ -64,7 +64,7 @@ public class ProductService {
                 .price(productRequestDTO.getPrice())
                 .stock(productRequestDTO.getStock())
                 .description(productRequestDTO.getDescription())
-                .imageUrl("")
+                .imageUrl(productRequestDTO.getImageUrl())
                 .build();
 
         productRepository.save(productEntity);
@@ -72,12 +72,15 @@ public class ProductService {
         return new ProductDetailData(
                 productEntity.getId(),
                 productEntity.getName(),
+                productEntity.getCategory().getId(),
                 productEntity.getCategory().getName(),
                 productEntity.getPrice(),
                 productEntity.getStock(),
                 productEntity.getDescription(),
+                productEntity.getRating(),
                 productEntity.getImageUrl(),
                 storeEntity.getLocation(),
+                storeEntity.getId(),
                 storeEntity.getStoreName()
         );
     }
@@ -91,6 +94,7 @@ public class ProductService {
         productEntity.setPrice(productRequestDTO.getPrice());
         productEntity.setStock(productRequestDTO.getStock());
         productEntity.setDescription(productRequestDTO.getDescription());
+        productEntity.setImageUrl(productRequestDTO.getImageUrl());
         productEntity.setCategory(categoryEntity);
 
         productRepository.save(productEntity);
@@ -98,12 +102,15 @@ public class ProductService {
         return new ProductDetailData(
                 productEntity.getId(),
                 productEntity.getName(),
+                productEntity.getCategory().getId(),
                 productEntity.getCategory().getName(),
                 productEntity.getPrice(),
                 productEntity.getStock(),
                 productEntity.getDescription(),
+                productEntity.getRating(),
                 productEntity.getImageUrl(),
                 productEntity.getStore().getLocation(),
+                productEntity.getStore().getId(),
                 productEntity.getStore().getStoreName()
         );
     }

@@ -6,12 +6,15 @@ import java.util.UUID;
 public record ProductDetailData(
         UUID id,
         String name,
+        UUID categoryId,
         String category,
         BigDecimal price,
         Integer stock,
         String description,
+        BigDecimal rating,
         String imageUrl,
         String location,
+        UUID storeId,
         String storeName
 ) {
 }
