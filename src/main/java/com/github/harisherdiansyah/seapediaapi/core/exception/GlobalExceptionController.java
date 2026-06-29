@@ -16,21 +16,21 @@ import java.util.stream.Collectors;
 public class GlobalExceptionController {
 
     @ExceptionHandler(DuplicateDataException.class)
-    public ResponseEntity<?> duplicateDataException(Exception ex) {
+    public ResponseEntity<?> duplicateDataException(DuplicateDataException ex) {
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
                 .body(ApiResponse.error(HttpStatus.CONFLICT.value(), ex.getMessage(), null));
     }
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<?> notFoundException(Exception ex) {
+    public ResponseEntity<?> notFoundException(NotFoundException ex) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(ApiResponse.error(HttpStatus.NOT_FOUND.value(), ex.getMessage(), null));
     }
 
     @ExceptionHandler(ForbiddenException.class)
-    public ResponseEntity<?> forbiddenException(Exception ex) {
+    public ResponseEntity<?> forbiddenException(ForbiddenException ex) {
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
                 .body(ApiResponse.error(HttpStatus.FORBIDDEN.value(), ex.getMessage(), null));
@@ -73,5 +73,12 @@ public class GlobalExceptionController {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), null));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<?> handleGenericException(Exception ex) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An unexpected error occurred: " + ex.getMessage(), null));
     }
 }

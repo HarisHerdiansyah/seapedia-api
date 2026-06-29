@@ -2,11 +2,9 @@ package com.github.harisherdiansyah.seapediaapi.features.products;
 
 import com.github.harisherdiansyah.seapediaapi.core.exception.ForbiddenException;
 import com.github.harisherdiansyah.seapediaapi.core.exception.NotFoundException;
-import com.github.harisherdiansyah.seapediaapi.core.utils.JwtUtility;
+import com.github.harisherdiansyah.seapediaapi.core.utils.SecurityUtil;
 import com.github.harisherdiansyah.seapediaapi.features.categories.CategoryEntity;
 import com.github.harisherdiansyah.seapediaapi.features.categories.CategoryService;
-import com.github.harisherdiansyah.seapediaapi.features.session.SessionService;
-import com.github.harisherdiansyah.seapediaapi.features.session.UserSessionInfo;
 import com.github.harisherdiansyah.seapediaapi.features.stores.StoreEntity;
 import com.github.harisherdiansyah.seapediaapi.features.stores.StoreService;
 import lombok.RequiredArgsConstructor;
@@ -22,14 +20,12 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ProductService {
-    private final JwtUtility jwtUtility;
     private final ProductRepository productRepository;
-    private final SessionService sessionService;
     private final StoreService storeService;
     private final CategoryService categoryService;
 
-    public ProductResponseDTO<ProductData> getAllProducts(Pageable pageable, UUID category, BigDecimal minPrice, BigDecimal maxPrice) {
-        Slice<ProductData> productSlice = productRepository.findProductSlices(pageable, category, minPrice, maxPrice);
+    public ProductResponseDTO<ProductData> getAllProducts(Pageable pageable, String search, UUID category, BigDecimal minPrice, BigDecimal maxPrice) {
+        Slice<ProductData> productSlice = productRepository.findProductSlices(pageable, search, category, minPrice, maxPrice);
         int pageNumber = productSlice.getNumber();
         boolean hasNext = productSlice.hasNext();
         List<ProductData> productDataList = productSlice.getContent();
@@ -42,18 +38,12 @@ public class ProductService {
                 .orElseThrow(() -> new NotFoundException("Product not found for ID: " + productId));
     }
 
-    public ProductDetailData createProduct(ProductRequestDTO productRequestDTO, String rt) {
-        if (!StringUtils.hasText(rt)) {
-            throw new ForbiddenException("Refresh token is missing.");
+    public ProductDetailData createProduct(ProductRequestDTO productRequestDTO) {
+        UUID userId = SecurityUtil.getCurrentUserId();
+        if (userId == null) {
+            throw new ForbiddenException("User not authenticated.");
         }
 
-        UUID currentTokenJti = UUID.fromString(jwtUtility.extractJti(rt));
-        if (!sessionService.isSessionExist(currentTokenJti)) {
-            throw new ForbiddenException("Session not found. Please re-login.");
-        }
-
-        UserSessionInfo userSessionInfo = sessionService.getUserSessionInfo(currentTokenJti);
-        UUID userId = userSessionInfo.getId();
         StoreEntity storeEntity = storeService.getStoreByUserId(userId);
         CategoryEntity categoryEntity = categoryService.getCategoryById(productRequestDTO.getCategoryId());
 
@@ -87,7 +77,7 @@ public class ProductService {
 
     public ProductDetailData updateProduct(UUID productId, ProductRequestDTO productRequestDTO) {
         ProductEntity productEntity = productRepository.findById(productId)
-                .orElseThrow(() -> new ForbiddenException("Product not found for ID: " + productId));
+                .orElseThrow(() -> new NotFoundException("Product not found for ID: " + productId));
         CategoryEntity categoryEntity = categoryService.getCategoryById(productRequestDTO.getCategoryId());
 
         productEntity.setName(productRequestDTO.getName());
@@ -117,7 +107,7 @@ public class ProductService {
 
     public void deleteProduct(UUID productId) {
         ProductEntity productEntity = productRepository.findById(productId)
-                .orElseThrow(() -> new ForbiddenException("Product not found for ID: " + productId));
+                .orElseThrow(() -> new NotFoundException("Product not found for ID: " + productId));
         productRepository.delete(productEntity);
     }
 }

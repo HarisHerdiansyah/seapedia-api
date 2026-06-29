@@ -19,11 +19,13 @@ public interface ProductRepository extends JpaRepository<ProductEntity, UUID> {
 
     @Query("SELECT new com.github.harisherdiansyah.seapediaapi.features.products.ProductData(p.id, p.name, c.name, p.price, p.rating, p.imageUrl, s.location, p.updatedAt) " +
             "FROM ProductEntity p JOIN p.store s JOIN p.category c " +
-            "WHERE (:category IS NULL OR c.id = :category) AND " +
+            "WHERE (:search IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
+            "(:category IS NULL OR c.id = :category) AND " +
             "(:minPrice IS NULL OR p.price >= :minPrice) AND " +
             "(:maxPrice IS NULL OR p.price <= :maxPrice)")
     Slice<ProductData> findProductSlices(
             Pageable pageable,
+            @Param("search") String search,
             @Param("category") UUID category,
             @Param("minPrice") BigDecimal minPrice,
             @Param("maxPrice") BigDecimal maxPrice

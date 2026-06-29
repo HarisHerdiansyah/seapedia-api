@@ -56,9 +56,9 @@ public class StoreService {
         storeRepository.save(storeEntity);
     }
 
-    public ProductResponseDTO<StoreProductData> getAllStoreProducts(Pageable pageable, UUID category, BigDecimal minPrice, BigDecimal maxPrice) {
+    public ProductResponseDTO<StoreProductData> getAllStoreProducts(Pageable pageable, String search, UUID category, BigDecimal minPrice, BigDecimal maxPrice) {
         StoreEntity storeEntity = getStoreByUserId(SecurityUtil.getCurrentUserId());
-        Slice<StoreProductData> productSlice = storeRepository.findProductSlicesByStoreId(pageable, storeEntity.getId(), category, minPrice, maxPrice);
+        Slice<StoreProductData> productSlice = storeRepository.findProductSlicesByStoreId(pageable, storeEntity.getId(), search, category, minPrice, maxPrice);
         int pageNumber = productSlice.getNumber();
         boolean hasNext = productSlice.hasNext();
         List<StoreProductData> storeProductDataList = productSlice.getContent();
