@@ -19,6 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -29,12 +30,15 @@ public class StoreController {
     private final StoreService storeService;
 
     @Operation(summary = "Register store", description = "Registers a new store for the user.")
-    @PreAuthorize("hasRole('NON_ADMIN') and hasAuthority('REGISTER_STORE')")
+    @PreAuthorize("hasAuthority('REGISTER_STORE')")
     @PostMapping("")
-    public ResponseEntity<?> registerStore(@Valid @RequestBody StoreRegisterRequestDTO storeRegisterRequestDTO) {
-        storeService.registerStore(storeRegisterRequestDTO);
+    public ResponseEntity<?> registerStore(
+            @Valid @RequestBody StoreRegisterRequestDTO storeRegisterRequestDTO,
+            @CookieValue(name = "refreshToken", defaultValue = "") String rt
+    ) {
+        Map<String, Object> result = storeService.registerStore(storeRegisterRequestDTO, rt);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(HttpStatus.CREATED.value(), "Store registered.", null));
+                .body(ApiResponse.success(HttpStatus.CREATED.value(), "Store registered.", result));
     }
 
     @Operation(summary = "My store data", description = "Retrieves store data belonging to the currently logged-in user.")

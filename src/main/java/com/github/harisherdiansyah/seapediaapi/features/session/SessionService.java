@@ -48,6 +48,11 @@ public class SessionService {
                 .orElseThrow(() -> new NotFoundException("Session not found."));
     }
 
+    public SessionEntity getUserSessionInfoByUserId(UUID userId) {
+        return sessionRepository.findSessionEntityByUserId(userId)
+                .orElseThrow(() -> new NotFoundException("Session not found."));
+    }
+
     /**
      * Cleans up sessions that have passed their expiry time.
      * Runs every hour to keep the sessions table lean.

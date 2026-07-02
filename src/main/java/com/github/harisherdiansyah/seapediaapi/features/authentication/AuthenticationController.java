@@ -47,7 +47,7 @@ public class AuthenticationController {
     }
 
     @Operation(summary = "Select active role", description = "Selects a role (Buyer/Seller) for non-admin users.")
-    @PreAuthorize("hasAuthority('SELECT_ROLE') and hasRole('NON_ADMIN')")
+    @PreAuthorize("hasAuthority('SELECT_ROLE')")
     @PostMapping("/select-active-role")
     public ResponseEntity<?> selectActiveRoleController(
             @Valid @RequestBody NonAdminRoleRequestDTO nonAdminRoleRequestDTO,

@@ -15,4 +15,6 @@ public interface SessionRepository extends JpaRepository<SessionEntity, UUID> {
     Optional<UserSessionInfo> findUserSessionInfoBySessionId(UUID id);
 
     void deleteAllByExpiresAtBefore(java.time.OffsetDateTime dateTime);
+
+    Optional<SessionEntity> findSessionEntityByUserId(UUID userId);
 }
