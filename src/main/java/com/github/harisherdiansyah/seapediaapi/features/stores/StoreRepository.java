@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import javax.swing.text.html.Option;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,8 @@ public interface StoreRepository extends JpaRepository<StoreEntity, UUID> {
     boolean existsByUserId(UUID userId);
 
     Optional<StoreEntity> findByUserId(UUID userId);
+
+    Optional<StoreEntity> findStoreEntityById(UUID storeId);
 
     @Query("SELECT s.storeName AS storeName, s.location AS location, u.username AS username, u.email AS email, s.createdAt AS joinedAt " +
             "FROM StoreEntity s JOIN s.user u WHERE u.id = :userId")

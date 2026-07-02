@@ -35,4 +35,6 @@ public interface ProductRepository extends JpaRepository<ProductEntity, UUID> {
             "FROM ProductEntity p JOIN p.store s JOIN p.category c " +
             "WHERE p.id = :id")
     Optional<ProductDetailData> findProductDetailById(@Param("id") UUID id);
+
+    Optional<ProductEntity> findProductEntityById(UUID id);
 }

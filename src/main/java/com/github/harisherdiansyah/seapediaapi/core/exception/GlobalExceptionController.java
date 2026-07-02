@@ -22,6 +22,13 @@ public class GlobalExceptionController {
                 .body(ApiResponse.error(HttpStatus.CONFLICT.value(), ex.getMessage(), null));
     }
 
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<?> unauthorizedException(NotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error(HttpStatus.UNAUTHORIZED.value(), ex.getMessage(), null));
+    }
+
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<?> notFoundException(NotFoundException ex) {
         return ResponseEntity
