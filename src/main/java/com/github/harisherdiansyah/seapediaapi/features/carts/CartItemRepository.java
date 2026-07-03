@@ -5,12 +5,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface CartItemRepository extends JpaRepository<CartItemsEntity, UUID> {
     @Query("""
-            SELECT new com.github.harisherdiansyah.seapediaapi.features.carts.CartItemsData(
+            SELECT new com.github.harisherdiansyah.seapediaapi.features.carts.CartItemQueryResult(
+                ci.id,
                 p.id,
                 p.name,
                 p.imageUrl,
@@ -22,4 +24,8 @@ public interface CartItemRepository extends JpaRepository<CartItemsEntity, UUID>
             WHERE ci.cart.id = :cartId
         """)
     List<CartItemQueryResult> findCartItemsByCartId(UUID cartId);
+
+    Optional<CartItemsEntity> findCartItemsEntityByProductId(UUID productId);
+
+    long countByCartId(UUID cartId);
 }

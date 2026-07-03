@@ -9,7 +9,6 @@ import com.github.harisherdiansyah.seapediaapi.features.drivers.DriverRepository
 import com.github.harisherdiansyah.seapediaapi.features.session.ActiveRole;
 import com.github.harisherdiansyah.seapediaapi.features.session.SessionEntity;
 import com.github.harisherdiansyah.seapediaapi.features.session.SessionService;
-import com.github.harisherdiansyah.seapediaapi.features.session.UserSessionInfo;
 import com.github.harisherdiansyah.seapediaapi.features.stores.StoreEntity;
 import com.github.harisherdiansyah.seapediaapi.features.stores.StoreRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -68,27 +68,28 @@ public class UserService {
         UUID userId = SecurityUtil.getCurrentUserId();
         List<ActiveRole> allowedAs = new ArrayList<>();
 
-        UserEntity user = userRepository.findUserEntityById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found."));
+        Optional<UserEntity> user = userRepository.findUserEntityById(userId);
+        boolean isUserExist = user.isPresent();
+        if (!isUserExist) throw new NotFoundException("User with id " + userId + " is never exist.");
         allowedAs.add(ActiveRole.BUYER);
 
-        StoreEntity store = storeRepository.findByUserId(userId)
-                .orElseThrow(() -> new NotFoundException("User is not register their store yet."));
-        if (store != null) allowedAs.add(ActiveRole.SELLER);
+        Optional<StoreEntity> store = storeRepository.findByUserId(userId);
+        boolean isStoreExist = store.isPresent();
+        if (isStoreExist) allowedAs.add(ActiveRole.SELLER);
 
         boolean isDriver = driverRepository.existsByUserId(userId);
         if (isDriver) allowedAs.add(ActiveRole.DRIVER);
 
         SessionEntity session = sessionService.getUserSessionInfoByUserId(userId);
         return new ProfileSummaryResponseDTO(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
+                user.map(UserEntity::getId).orElse(null),
+                user.map(UserEntity::getUsername).orElse(null),
+                user.map(UserEntity::getEmail).orElse(null),
                 session.getActiveRole(),
                 allowedAs,
-                store != null ? store.getId() : null,
-                store != null ? store.getStoreName() : null,
-                store != null ? store.getLocation() : null
+                store.map(StoreEntity::getId).orElse(null),
+                store.map(StoreEntity::getStoreName).orElse(null),
+                store.map(StoreEntity::getLocation).orElse(null)
         );
     }
 }

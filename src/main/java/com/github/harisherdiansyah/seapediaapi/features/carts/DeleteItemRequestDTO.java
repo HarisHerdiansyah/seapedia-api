@@ -7,9 +7,9 @@ import java.util.UUID;
 
 @Data
 public class DeleteItemRequestDTO {
-    @NotNull(message = "Items data cannot be null.")
-    private UUID itemsId;
+    @NotNull(message = "Cart item data cannot be null.")
+    private UUID cartItemId;
 
-    @NotNull(message = "Flag cannot be null.")
-    private boolean isLastProduct;
+    @NotNull(message = "Cart data cannot be null.")
+    private UUID cartId;
 }
