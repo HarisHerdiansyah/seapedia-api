@@ -31,7 +31,7 @@ public class DeliveryEntity {
     private DeliveryMethod deliveryMethod;
 
     @Column(nullable = false, precision = 12, scale = 2)
-    private BigDecimal price = BigDecimal.ZERO;
+    private BigDecimal price;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

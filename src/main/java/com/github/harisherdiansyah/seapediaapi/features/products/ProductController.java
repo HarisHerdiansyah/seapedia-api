@@ -3,7 +3,7 @@ package com.github.harisherdiansyah.seapediaapi.features.products;
 import com.github.harisherdiansyah.seapediaapi.core.utils.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +26,11 @@ public class ProductController {
     private final ProductService productService;
 
     @Operation(summary = "Get all products", description = "Retrieves a list of products with support for pagination, search, and filtering.")
+    @SecurityRequirement(name = "")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Products retrieved successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("")
     public ResponseEntity<?> getAllProducts(
             @Parameter(description = "Page number (starting from 0)") @RequestParam(defaultValue = "0") int page,
@@ -57,6 +62,12 @@ public class ProductController {
     }
 
     @Operation(summary = "Get product detail", description = "Retrieves detailed product information by ID.")
+    @SecurityRequirement(name = "")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Product detail retrieved successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Not found - product does not exist"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<?> getProductById(@Parameter(description = "Product UUID") @PathVariable UUID id) {
         ProductDetailData response = productService.getProductById(id);
@@ -66,6 +77,13 @@ public class ProductController {
     }
 
     @Operation(summary = "Add new product", description = "Creates a new product entry. Requires SELLER role and MANAGE_PRODUCT authority.")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Product created successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Bad request - validation failed"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Unauthorized - token missing or invalid"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Forbidden - requires SELLER role with MANAGE_PRODUCT authority"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PreAuthorize("hasRole('SELLER') and hasAuthority('MANAGE_PRODUCT')")
     @PostMapping("")
     public ResponseEntity<?> createProduct(
@@ -78,6 +96,14 @@ public class ProductController {
     }
 
     @Operation(summary = "Update product", description = "Updates existing product data. Requires SELLER role and MANAGE_PRODUCT authority.")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Product updated successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Bad request - validation failed"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Unauthorized - token missing or invalid"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Forbidden - requires SELLER role with MANAGE_PRODUCT authority"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Not found - product does not exist"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PreAuthorize("hasRole('SELLER') and hasAuthority('MANAGE_PRODUCT')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProduct(
@@ -90,6 +116,13 @@ public class ProductController {
     }
 
     @Operation(summary = "Delete product", description = "Deletes product by ID. Requires SELLER role and MANAGE_PRODUCT authority.")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Product deleted successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Unauthorized - token missing or invalid"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Forbidden - requires SELLER role with MANAGE_PRODUCT authority"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Not found - product does not exist"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PreAuthorize("hasRole('SELLER') and hasAuthority('MANAGE_PRODUCT')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProduct(@Parameter(description = "Product UUID") @PathVariable UUID id) {

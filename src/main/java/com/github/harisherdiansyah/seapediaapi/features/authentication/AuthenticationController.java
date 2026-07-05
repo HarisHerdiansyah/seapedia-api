@@ -4,6 +4,7 @@ import com.github.harisherdiansyah.seapediaapi.core.utils.ApiResponse;
 import com.github.harisherdiansyah.seapediaapi.core.utils.RequestUtility;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -25,6 +26,13 @@ public class AuthenticationController {
     private final RequestUtility requestUtility;
 
     @Operation(summary = "Register new user", description = "Registers a new user to the system.")
+    @SecurityRequirement(name = "")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "User registered successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Bad request - validation failed"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "Conflict - email or username already exists"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping("/register")
     public ResponseEntity<?> registerController(@Valid @RequestBody RegisterRequestDTO requestDTO) {
         RegisterResponseDTO responseDTO = authenticationService.register(requestDTO);
@@ -33,6 +41,13 @@ public class AuthenticationController {
     }
 
     @Operation(summary = "Login", description = "Login to the system and obtain access token and refresh token via cookie.")
+    @SecurityRequirement(name = "")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Login successful"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Bad request - validation failed"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Unauthorized - invalid email or password"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping("/login")
     public ResponseEntity<?> loginController(@Valid @RequestBody LoginRequestDTO requestDTO, HttpServletRequest httpServletRequest) {
         String ipAddress = requestUtility.getClientIpAddress(httpServletRequest);
@@ -47,6 +62,13 @@ public class AuthenticationController {
     }
 
     @Operation(summary = "Select active role", description = "Selects a role (Buyer/Seller) for non-admin users.")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Active role updated successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Bad request - validation failed"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Unauthorized - token missing or invalid"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Forbidden - requires SELECT_ROLE authority"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PreAuthorize("hasAuthority('SELECT_ROLE')")
     @PostMapping("/select-active-role")
     public ResponseEntity<?> selectActiveRoleController(
@@ -58,6 +80,12 @@ public class AuthenticationController {
     }
 
     @Operation(summary = "Refresh token", description = "Renews access token using a valid refresh token.")
+    @SecurityRequirement(name = "")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Token refreshed successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Unauthorized - refresh token missing or expired"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshTokenController(
             @Parameter(description = "Refresh Token from Cookie") @CookieValue(name = "refreshToken", defaultValue = "") String rt, HttpServletRequest httpServletRequest) {
@@ -73,6 +101,12 @@ public class AuthenticationController {
     }
 
     @Operation(summary = "Reset password", description = "Changes user password.")
+    @SecurityRequirement(name = "")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Password reset successful"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Bad request - validation failed"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PatchMapping("/reset-password")
     public ResponseEntity<?> resetPasswordController(@Valid @RequestBody ResetPasswordRequestDTO requestDTO) {
         authenticationService.resetPassword(requestDTO);
@@ -81,6 +115,12 @@ public class AuthenticationController {
     }
 
     @Operation(summary = "Logout", description = "Logs out from the system and removes the refresh token.")
+    @SecurityRequirement(name = "")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Logout successful"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Unauthorized - refresh token missing or invalid"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping("/logout")
     public ResponseEntity<?> logoutController(@Parameter(description = "Refresh Token from Cookie") @CookieValue(name = "refreshToken", defaultValue = "") String rt) {
         String response = authenticationService.logout(rt);

@@ -2,6 +2,7 @@ package com.github.harisherdiansyah.seapediaapi.features.categories;
 
 import com.github.harisherdiansyah.seapediaapi.core.utils.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,11 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @Operation(summary = "Get all categories", description = "Retrieves a list of all available product categories.")
+    @SecurityRequirement(name = "")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Categories retrieved successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("")
     public ResponseEntity<?> getAllCategories() {
         List<CategoryResponseDTO> categories = categoryService.getAllCategories();
