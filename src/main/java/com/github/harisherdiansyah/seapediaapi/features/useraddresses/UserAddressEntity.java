@@ -33,7 +33,7 @@ public class UserAddressEntity {
 
     @Column(name = "is_default", nullable = false)
     @Builder.Default
-    private Boolean isDefault = Boolean.TRUE;
+    private Boolean isDefault = Boolean.FALSE;
 
     @Column(name = "receiver_name", nullable = false)
     private String receiverName;
