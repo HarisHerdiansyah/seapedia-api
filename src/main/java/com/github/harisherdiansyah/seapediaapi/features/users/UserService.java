@@ -11,9 +11,13 @@ import com.github.harisherdiansyah.seapediaapi.features.session.SessionEntity;
 import com.github.harisherdiansyah.seapediaapi.features.session.SessionService;
 import com.github.harisherdiansyah.seapediaapi.features.stores.StoreEntity;
 import com.github.harisherdiansyah.seapediaapi.features.stores.StoreRepository;
+import com.github.harisherdiansyah.seapediaapi.features.wallets.WalletEntity;
+import com.github.harisherdiansyah.seapediaapi.features.wallets.WalletRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +29,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final StoreRepository storeRepository;
     private final DriverRepository driverRepository;
+    private final WalletRepository walletRepository;
     private final SessionService sessionService;
 
     public boolean isUserExistByUsername(String username) {
@@ -45,6 +50,7 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException("User with id " + id + " is never exist."));
     }
 
+    @Transactional
     public RegisterResponseDTO createUser(RegisterRequestDTO requestDTO) {
         UserEntity.UserEntityBuilder builder = UserEntity.builder()
                 .username(requestDTO.getUsername())
@@ -53,6 +59,13 @@ public class UserService {
                 .role(requestDTO.getRole());
 
         UserEntity newUser = userRepository.save(builder.build());
+        WalletEntity newWallet = WalletEntity.builder()
+                .user(newUser)
+                .balance(BigDecimal.ZERO)
+                .build();
+
+        walletRepository.save(newWallet);
+
         return new RegisterResponseDTO(newUser.getId(), newUser.getUsername(), newUser.getEmail(), newUser.getRole());
     }
 
@@ -80,6 +93,9 @@ public class UserService {
         boolean isDriver = driverRepository.existsByUserId(userId);
         if (isDriver) allowedAs.add(ActiveRole.DRIVER);
 
+        WalletEntity userWallet = walletRepository.findByUserId(userId)
+                .orElseThrow(() -> new NotFoundException("Wallet for user with id " + userId + " is never exist."));
+
         SessionEntity session = sessionService.getUserSessionInfoByUserId(userId);
         return new ProfileSummaryResponseDTO(
                 user.map(UserEntity::getId).orElse(null),
@@ -87,6 +103,8 @@ public class UserService {
                 user.map(UserEntity::getEmail).orElse(null),
                 session.getActiveRole(),
                 allowedAs,
+                userWallet.getId(),
+                userWallet.getBalance(),
                 store.map(StoreEntity::getId).orElse(null),
                 store.map(StoreEntity::getStoreName).orElse(null),
                 store.map(StoreEntity::getLocation).orElse(null)
